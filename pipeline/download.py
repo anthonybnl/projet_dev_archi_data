@@ -6,11 +6,20 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
+import yaml
+from pathlib import Path
 # On spécifie le nom du fichier car il ne s'appelle pas ".env"
-load_dotenv(dotenv_path="url.env")
+#load_dotenv(dotenv_path="url.env")
 
-def download_file(url, dest_folder="../data/raw"):
+#################### DATA ####################
+def load_config(config_file="url_data.yaml",**kwargs):
+    with open(config_file, "r", encoding="utf-8") as f:
+        # safe_load empêche l'exécution de code arbitraire dans le YAML
+        return yaml.safe_load(f)
+
+#################### DOWNLOAD ####################
+
+def download_file(url, dest_folder="../data/raw",**kwargs):
     """
     Télécharge un fichier en récupérer son vrai nom via les en-têtes HTTP ou l'URL.
     """
@@ -51,7 +60,7 @@ def download_file(url, dest_folder="../data/raw"):
     return file_path
 
 
-def function_unzip(file_path, extract_to="../data/raw"):
+def function_unzip(file_path, extract_to="../data/raw",**kwargs):
     """
     Vérifie si le fichier est une archive, l'extrait et supprime l'original.
     """
@@ -88,7 +97,7 @@ def function_unzip(file_path, extract_to="../data/raw"):
         print(f" Erreur lors de l'extraction de {file_path.name}: {e}")
         return False
 
-def download_from_index(index_url, dest_folder="../data/raw", filters=None):
+def download_from_index(index_url, dest_folder="../data/raw", filters=None, **kwargs):
     """
     Scrappe une page d'index Apache, filtre les fichiers selon des mots-clés
     et télécharge + extrait chaque archive trouvée.
@@ -112,7 +121,7 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None):
 
     print(f"[INFO] {len(file_links)} fichier(s) a telecharger en parallele...")
 
-    def download_and_extract(filename):
+    def download_and_extract(filename, **kwargs):
         url = base_url + filename
         path = download_file(url, dest_folder=dest_folder)
         function_unzip(path, extract_to=dest_folder)
@@ -130,6 +139,6 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None):
     return downloaded
 
 
-def download_one(url,dest_folder):
+def download_one(url,dest_folder, **kwargs):
     path = download_file(url,dest_folder)
     function_unzip(path,dest_folder)
