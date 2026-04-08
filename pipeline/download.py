@@ -87,3 +87,36 @@ def function_unzip(file_path, extract_to="../data/raw"):
     except Exception as e:
         print(f" Erreur lors de l'extraction de {file_path.name}: {e}")
         return False
+
+def download_from_index(index_url, dest_folder="../data/raw", filters=None):
+    """
+    Scrappe une page d'index Apache, filtre les fichiers selon des mots-clés
+    et télécharge + extrait chaque archive trouvée.
+    filters: liste de chaînes à chercher dans le nom (ex: ['4G', '5G'])
+    """
+    response = requests.get(index_url, allow_redirects=True)
+    response.raise_for_status()
+
+    base_url = index_url.rstrip("/") + "/"
+    links = re.findall(r'href="([^"]+)"', response.content.decode("utf-8", errors="replace"))
+
+    # Garder uniquement les fichiers (pas les dossiers/liens parents)
+    file_links = [l for l in links if not l.startswith("http") and not l.startswith("..") and "." in l]
+
+    if filters:
+        file_links = [l for l in file_links if any(f in l for f in filters)]
+
+    if not file_links:
+        print(f"[SKIP] Aucun fichier trouve avec les filtres {filters}")
+        return []
+
+    print(f"[INFO] {len(file_links)} fichier(s) a telecharger...")
+    downloaded = []
+    for filename in file_links:
+        url = base_url + filename
+        path = download_file(url, dest_folder=dest_folder)
+        function_unzip(path, extract_to=dest_folder)
+        downloaded.append(path)
+
+    return downloaded
+
