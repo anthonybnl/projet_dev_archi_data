@@ -6,7 +6,7 @@ import type { Indicator, ScoresMap } from '../types'
 
 const API = '/api'
 
-const COLOR_EXPR = (field: Indicator): maplibregl.ExpressionSpecification => [
+const get_fill_color_from_indicator = (field: Indicator): maplibregl.ExpressionSpecification => [
     'interpolate', ['linear'], ['get', field],
     0,   '#e74c3c',
     0.5, '#f39c12',
@@ -20,7 +20,6 @@ interface Props {
 export default function Map({ selectedIndicator }: Props) {
     const containerRef = useRef<HTMLDivElement>(null)
     const mapRef = useRef<maplibregl.Map | null>(null)
-    const loadedRef = useRef(false)
 
     // Initialise la carte et charge les données une seule fois
     useEffect(() => {
@@ -70,8 +69,10 @@ export default function Map({ selectedIndicator }: Props) {
                 type: 'fill',
                 source: 'arrondissements',
                 paint: {
-                    'fill-color': COLOR_EXPR(selectedIndicator),
-                    'fill-opacity': 0.6,
+                    'fill-color': selectedIndicator !== 'aucun'
+                        ? get_fill_color_from_indicator(selectedIndicator)
+                        : '#000000',
+                    'fill-opacity': selectedIndicator !== 'aucun' ? 0.6 : 0,
                 },
             })
 
@@ -116,24 +117,26 @@ export default function Map({ selectedIndicator }: Props) {
                 popup.remove()
             })
 
-            loadedRef.current = true
         })
 
         return () => {
             mapRef.current?.remove()
             mapRef.current = null
-            loadedRef.current = false
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Met à jour la couleur quand l'indicateur change
     useEffect(() => {
-        if (!loadedRef.current || !mapRef.current) return
-        mapRef.current.setPaintProperty(
-            'arrondissements-fill',
-            'fill-color',
-            COLOR_EXPR(selectedIndicator)
-        )
+        const map = mapRef.current
+        if (!map?.getLayer('arrondissements-fill')) return
+        if (selectedIndicator === 'aucun') {
+            map.setPaintProperty('arrondissements-fill', 'fill-opacity', 0)
+            map.setPaintProperty("arrondissements-border", 'line-color', '#000000')
+        } else {
+            map.setPaintProperty('arrondissements-fill', 'fill-opacity', 0.6)
+            map.setPaintProperty('arrondissements-fill', 'fill-color', get_fill_color_from_indicator(selectedIndicator))
+            map.setPaintProperty("arrondissements-border", 'line-color', '#ffffff')
+        }
     }, [selectedIndicator])
 
     return <div ref={containerRef} style={{ width: '100%', height: '100vh' }} />

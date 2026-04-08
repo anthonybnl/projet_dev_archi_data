@@ -1,4 +1,4 @@
-export type Indicator = 'environnement' | 'mobilite' | 'score'
+export type Indicator = 'environnement' | 'mobilite' | 'score' | 'aucun'
 
 export interface ArrondissementScores {
     environnement: number

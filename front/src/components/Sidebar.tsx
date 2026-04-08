@@ -10,6 +10,7 @@ const OPTIONS: { value: Indicator; label: string }[] = [
     { value: 'score', label: 'Total' },
     { value: 'environnement', label: 'Environnement' },
     { value: 'mobilite', label: 'Mobilité' },
+    { value: 'aucun', label: 'Aucun' },
 ]
 
 export default function Sidebar({ selected, onChange }: Props) {
@@ -19,7 +20,7 @@ export default function Sidebar({ selected, onChange }: Props) {
             <p className="sidebar-subtitle">Paris — indicateurs par arrondissement</p>
 
             <div className="sidebar-section">
-                <label className="sidebar-label">Indicateur affiché</label>
+                <label className="sidebar-label">INDICATEUR AFFICHÉ</label>
                 <ul className="indicator-list">
                     {OPTIONS.map(({ value, label }) => (
                         <li key={value}>
