@@ -5,14 +5,14 @@ import py7zr
 import requests
 from pathlib import Path
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # On spécifie le nom du fichier car il ne s'appelle pas ".env"
 load_dotenv(dotenv_path="url.env")
 
 def download_file(url, dest_folder="../data/raw"):
     """
-    Télécharge un fichier en récupérer son vrai nom
-    via les en-têtes HTTP ou l'URL.
+    Télécharge un fichier en récupérer son vrai nom via les en-têtes HTTP ou l'URL.
     """
     path_dest = Path(dest_folder)
     path_dest.mkdir(parents=True, exist_ok=True)
@@ -110,13 +110,26 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None):
         print(f"[SKIP] Aucun fichier trouve avec les filtres {filters}")
         return []
 
-    print(f"[INFO] {len(file_links)} fichier(s) a telecharger...")
-    downloaded = []
-    for filename in file_links:
+    print(f"[INFO] {len(file_links)} fichier(s) a telecharger en parallele...")
+
+    def download_and_extract(filename):
         url = base_url + filename
         path = download_file(url, dest_folder=dest_folder)
         function_unzip(path, extract_to=dest_folder)
-        downloaded.append(path)
+        return path
+
+    downloaded = []
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {executor.submit(download_and_extract, f): f for f in file_links}
+        for future in as_completed(futures):
+            try:
+                downloaded.append(future.result())
+            except Exception as e:
+                print(f"[ERREUR] {futures[future]} : {e}")
 
     return downloaded
 
+
+def download_one(url,dest_folder):
+    path = download_file(url,dest_folder)
+    function_unzip(path,dest_folder)
