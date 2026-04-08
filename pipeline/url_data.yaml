@@ -1,0 +1,16 @@
+# Configuration des sources de données (Architecture Médaillon - Raw Layer)
+reseau:
+    haut_debit: "https://www.data.gouv.fr/api/1/datasets/r/e981ecb7-f1e7-41aa-9232-267294c53a46"
+    antennes: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/antennes-relais/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+    couvertures_theoriques: "https://data.arcep.fr/mobile/couvertures_theoriques/last/Metropole/00_Metropole"
+
+environnement:
+  arbres: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/les-arbres/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  espaces_verts: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ilots_fraicheur: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/ilots-de-fraicheur-equipements-activites/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  dechets_trilib: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/dechets-menagers-points-dapport-volontaire-stations-trilib/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+
+mobilite:
+  velib: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-emplacement-des-stations/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  metro: "https://www.data.gouv.fr/api/1/datasets/r/5b645234-e6fd-4de8-889c-574a80531aca"
+  bus: "https://data.iledefrance-mobilites.fr/api/explore/v2.1/catalog/datasets/arrets-lignes/exports/csv?refine=nom_commune%3AParis"
