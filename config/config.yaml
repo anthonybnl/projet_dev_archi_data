@@ -1,0 +1,10 @@
+database:
+  host: localhost
+  port: 5435
+  name: data_engineering
+  user: postgres
+  password: younes687
+
+layers:
+  silver_schema: silver
+  gold_schema: gold
