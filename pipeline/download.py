@@ -1,15 +1,10 @@
-import os
 import re
 import zipfile
 import py7zr
 import requests
-from pathlib import Path
-from dotenv import load_dotenv
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import yaml
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-# On spécifie le nom du fichier car il ne s'appelle pas ".env"
-#load_dotenv(dotenv_path="url.env")
 
 #################### DATA LOAD ####################
 def load_config(config_file="url_data.yaml",**kwargs):
@@ -39,7 +34,8 @@ def download_file(url, dest_folder="../data/raw",**kwargs):
 
     # Si non trouvé, on utilise la fin de l'URL
     if not filename:
-        filename = url.split("/")[-1].split("?")[0]
+        final_url = response.url
+        filename = final_url.split("/")[-1].split("?")[0]
 
     file_path = path_dest / filename
 
@@ -71,11 +67,26 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
         print(f"Erreur : Le fichier {file_path} n'existe pas.")
         return False
 
+    def change_extension(zipfile, file_path):
+        with zipfile.ZipFile(file_path, 'r') as zip_ref:
+            # On parcourt chaque fichier dans l'archive
+            for member in zip_ref.namelist():
+                # Extraction du fichier individuel
+                zip_ref.extract(member, final_dest)
+
+                # Gestion du renommage .txt vers .csv
+                extracted_file = Path(final_dest) / member
+                if extracted_file.suffix.lower() == '.txt':
+                    new_file = extracted_file.with_suffix('.csv')
+                    # Renomme uniquement si le fichier .csv n'existe pas déjà
+                    extracted_file.replace(new_file)
+                    print(f"Renommé : {extracted_file.name} -> {new_file.name}")
+
     compressed_extensions = ['.zip', '.7z', '.rar', '.gz']
 
     if file_path.suffix.lower() not in compressed_extensions:
-        print(f"L'extension du fichier: {file_path.name} n'est pas une archive reconnue.")
-        return False
+        print(f"ℹ{file_path.name} n'est pas une archive (CSV/JSON/Autre). Conservation du fichier brut.")
+        return True
 
     try:
         # On crée un sous-dossier au nom du fichier pour éviter de mélanger les fichiers extraits
@@ -85,7 +96,7 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
         if file_path.suffix.lower() == '.zip':
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
                 zip_ref.extractall(final_dest)
-
+                change_extension(zipfile,file_path)
         elif file_path.suffix.lower() == '.7z':
             with py7zr.SevenZipFile(file_path, mode='r') as z:
                 z.extractall(path=final_dest)
@@ -142,3 +153,37 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None, **kw
 def download_one(url,dest_folder, **kwargs):
     path = download_file(url,dest_folder)
     function_unzip(path,dest_folder)
+
+#################### PARALLELISATION ####################
+def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw"):
+    """
+    Parcourt un dictionnaire de type {nom_source: url} et télécharge
+    en fonction de la clé.
+    """
+    dest_folder = Path(base_path) / feature_name
+    dest_folder.mkdir(parents=True, exist_ok=True)
+
+    print(f"\n--- Catégorie : {feature_name.upper()} ---")
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {}
+
+        for key, url in urls_dict.items():
+            # Routage vers la fonction spéciale Arcep
+            if key == "couvertures_theoriques":
+                print(f"Scan d'index détecté pour : {key}")
+                dest_folder = "../data/raw/reseau/couverture_theorique"
+                futures[executor.submit(download_from_index, url,dest_folder,filters=["4G", "5G"] )] = key
+
+            # Routage vers le téléchargement classique
+            else:
+                futures[executor.submit(download_one, url, str(dest_folder))] = key
+
+        # Gestion des retours
+        for future in as_completed(futures):
+            source_name = futures[future]
+            try:
+                future.result()
+                print(f"Terminé : {source_name}")
+            except Exception as e:
+                print(f"Erreur sur '{source_name}': {e}")
