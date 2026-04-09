@@ -4,6 +4,8 @@ import './Sidebar.css'
 interface Props {
     selected: Indicator
     onChange: (i: Indicator) => void
+    showEspacesVerts: boolean
+    onToggleEspacesVerts: () => void
 }
 
 const OPTIONS: { value: Indicator; label: string }[] = [
@@ -13,7 +15,7 @@ const OPTIONS: { value: Indicator; label: string }[] = [
     { value: 'aucun', label: 'Aucun' },
 ]
 
-export default function Sidebar({ selected, onChange }: Props) {
+export default function Sidebar({ selected, onChange, showEspacesVerts, onToggleEspacesVerts }: Props) {
     return (
         <aside className="sidebar">
             <h2 className="sidebar-title">Urban Data Explorer</h2>
@@ -33,6 +35,18 @@ export default function Sidebar({ selected, onChange }: Props) {
                         </li>
                     ))}
                 </ul>
+            </div>
+
+            <div className="sidebar-section">
+                <label className="sidebar-label">COUCHES</label>
+                <label className="toggle-label">
+                    <input
+                        type="checkbox"
+                        checked={showEspacesVerts}
+                        onChange={onToggleEspacesVerts}
+                    />
+                    Espaces verts
+                </label>
             </div>
 
             <div className="sidebar-legend">

@@ -15,11 +15,13 @@ const get_fill_color_from_indicator = (field: Indicator): maplibregl.ExpressionS
 
 interface Props {
     selectedIndicator: Indicator
+    showEspacesVerts: boolean
 }
 
-export default function Map({ selectedIndicator }: Props) {
+export default function Map({ selectedIndicator, showEspacesVerts }: Props) {
     const containerRef = useRef<HTMLDivElement>(null)
     const mapRef = useRef<maplibregl.Map | null>(null)
+    const espacesVertsFetchedRef = useRef(false)
 
     // Initialise la carte et charge les données une seule fois
     useEffect(() => {
@@ -39,11 +41,10 @@ export default function Map({ selectedIndicator }: Props) {
         map.addControl(new maplibregl.NavigationControl(), 'top-right')
 
         map.on('load', async () => {
-            const [geojson, scores, espacesVerts]: [FeatureCollection<Geometry>, ScoresMap, FeatureCollection<Geometry>] =
+            const [geojson, scores]: [FeatureCollection<Geometry>, ScoresMap] =
                 await Promise.all([
                     fetch(`${API}/arrondissements/`).then(r => r.json()),
                     fetch(`${API}/scores/`).then(r => r.json()),
-                    fetch(`${API}/environnement/espaces_verts`).then(r => r.json()),
                 ])
 
             // Injection de tous les scores dans les propriétés de chaque feature
@@ -64,17 +65,19 @@ export default function Map({ selectedIndicator }: Props) {
             }
 
             map.addSource('arrondissements', { type: 'geojson', data: enriched })
-            map.addSource('espaces_verts', { type: 'geojson', data: espacesVerts })
 
             map.addLayer({
                 id: 'arrondissements-fill',
                 type: 'fill',
                 source: 'arrondissements',
+                layout: {
+                    visibility: selectedIndicator !== 'aucun' ? 'visible' : 'none',
+                },
                 paint: {
-                    'fill-color': selectedIndicator !== 'aucun'
-                        ? get_fill_color_from_indicator(selectedIndicator)
-                        : '#000000',
-                    'fill-opacity': selectedIndicator !== 'aucun' ? 0.6 : 0,
+                    'fill-color': get_fill_color_from_indicator(
+                        selectedIndicator !== 'aucun' ? selectedIndicator : 'score'
+                    ),
+                    'fill-opacity': 0.6,
                 },
             })
 
@@ -89,15 +92,6 @@ export default function Map({ selectedIndicator }: Props) {
                 },
             })
 
-                map.addLayer({
-                id: 'espaces-verts',
-                type: 'fill',
-                source: 'espaces_verts',
-                paint: {
-                    'fill-color': '#1eb600',
-                    'fill-opacity': 0.8,
-                },
-            })
 
 
             // Popup au survol
@@ -113,11 +107,10 @@ export default function Map({ selectedIndicator }: Props) {
                     mobilite: number
                     score: number
                 }
-                const num = p.c_ar
                 popup
                     .setLngLat(e.lngLat)
                     .setHTML(`
-                        <strong>Paris ${num}</strong><br/>
+                        <strong>Paris ${p.c_ar}</strong><br/>
                         Environnement : ${(p.environnement * 100).toFixed(0)} / 100<br/>
                         Mobilité : ${(p.mobilite * 100).toFixed(0)} / 100<br/>
                         <br/>
@@ -138,17 +131,46 @@ export default function Map({ selectedIndicator }: Props) {
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+    // lazy load des espaces verts
+    useEffect(() => {
+        const map = mapRef.current
+        if (!map?.getLayer('arrondissements-fill')) return // carte pas encore prête
+
+        const setVisibility = (visible: boolean) => {
+            map.setLayoutProperty('espaces-verts', 'visibility', visible ? 'visible' : 'none')
+        }
+
+        if (!espacesVertsFetchedRef.current && showEspacesVerts) {
+            // Premier toggle : on fetch et on ajoute source + layer
+            espacesVertsFetchedRef.current = true
+            fetch(`${API}/environnement/espaces_verts`)
+                .then(r => r.json())
+                .then((data: FeatureCollection<Geometry>) => {
+                    map.addSource('espaces_verts', { type: 'geojson', data })
+                    map.addLayer({
+                        id: 'espaces-verts',
+                        type: 'fill',
+                        source: 'espaces_verts',
+                        paint: { 'fill-color': '#1eb600', 'fill-opacity': 0.6 },
+                    }, 'arrondissements-fill') // inséré sous les arrondissements
+                })
+        } else if (map.getLayer('espaces-verts')) {
+            // Toggles suivants : on change juste la visibilité
+            setVisibility(showEspacesVerts)
+        }
+    }, [showEspacesVerts])
+
     // Met à jour la couleur quand l'indicateur change
     useEffect(() => {
         const map = mapRef.current
         if (!map?.getLayer('arrondissements-fill')) return
         if (selectedIndicator === 'aucun') {
-            map.setPaintProperty('arrondissements-fill', 'fill-opacity', 0)
-            map.setPaintProperty("arrondissements-border", 'line-color', '#000000')
+            map.setLayoutProperty('arrondissements-fill', 'visibility', 'none')
+            map.setPaintProperty('arrondissements-border', 'line-color', '#000000')
         } else {
-            map.setPaintProperty('arrondissements-fill', 'fill-opacity', 0.6)
+            map.setLayoutProperty('arrondissements-fill', 'visibility', 'visible')
             map.setPaintProperty('arrondissements-fill', 'fill-color', get_fill_color_from_indicator(selectedIndicator))
-            map.setPaintProperty("arrondissements-border", 'line-color', '#ffffff')
+            map.setPaintProperty('arrondissements-border', 'line-color', '#ffffff')
         }
     }, [selectedIndicator])
 
