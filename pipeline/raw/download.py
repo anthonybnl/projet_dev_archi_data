@@ -8,16 +8,21 @@ from pathlib import Path
 
 #################### DATA LOAD ####################
 def load_config(config_file="url_data.yaml",**kwargs):
+    base_path = Path(__file__).resolve().parent
+    config_file = base_path / config_file
     with open(config_file, "r", encoding="utf-8") as f:
         # safe_load empêche l'exécution de code arbitraire dans le YAML
         return yaml.safe_load(f)
 
+def base_dir_projet():
+    return Path(__file__).resolve().parents[2]
 #################### DOWNLOAD ####################
 
-def download_file(url, dest_folder="../data/raw",**kwargs):
+def download_file(url, dest_folder=base_dir_projet(),**kwargs):
     """
     Télécharge un fichier en récupérer son vrai nom via les en-têtes HTTP ou l'URL.
     """
+
     path_dest = Path(dest_folder)
     path_dest.mkdir(parents=True, exist_ok=True)
 
@@ -56,13 +61,10 @@ def download_file(url, dest_folder="../data/raw",**kwargs):
     return file_path
 
 
-def function_unzip(file_path, extract_to="../data/raw",**kwargs):
+def function_unzip(file_path, dest_folder=base_dir_projet(),**kwargs):
     """
     Vérifie si le fichier est une archive, l'extrait et supprime l'original.
     """
-    file_path = Path(file_path)
-    extract_path = Path(extract_to)
-
     if not file_path.exists():
         print(f"Erreur : Le fichier {file_path} n'existe pas.")
         return False
@@ -85,11 +87,11 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
     compressed_extensions = ['.zip', '.7z', '.rar', '.gz']
 
     if file_path.suffix.lower() not in compressed_extensions:
-        print(f"ℹ{file_path.name} n'est pas une archive (CSV/JSON/Autre). Conservation du fichier brut.")
+        print(f"[INFO] {file_path.name} n'est pas une archive (CSV/JSON/Autre). Conservation du fichier brut.")
         return True
 
     try:
-        final_dest = extract_path
+        final_dest = dest_folder
         final_dest.mkdir(parents=True, exist_ok=True)
         # Verification si le s'est un fichier compresser
         if file_path.suffix.lower() == '.zip':
@@ -107,12 +109,13 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
         print(f" Erreur lors de l'extraction de {file_path.name}: {e}")
         return False
 
-def download_from_index(index_url, dest_folder="../data/raw", filters=None, **kwargs):
+def download_from_index(index_url, dest_folder=base_dir_projet(), filters=None, **kwargs):
     """
     Scrappe une page d'index Apache, filtre les fichiers selon des mots-clés
     et télécharge + extrait chaque archive trouvée.
     filters: liste de chaînes à chercher dans le nom (ex: ['4G', '5G'])
     """
+    dest_folder = Path(dest_folder)
     response = requests.get(index_url, allow_redirects=True)
     response.raise_for_status()
 
@@ -134,7 +137,7 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None, **kw
     def download_and_extract(filename, **kwargs):
         url = base_url + filename
         path = download_file(url, dest_folder=dest_folder)
-        function_unzip(path, extract_to=dest_folder)
+        function_unzip(path, dest_folder=dest_folder)
         return path
 
     downloaded = []
@@ -154,12 +157,12 @@ def download_one(url,dest_folder, **kwargs):
     function_unzip(path,dest_folder)
 
 #################### PARALLELISATION ####################
-def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw",**kwargs):
+def parallel_download_routing(urls_dict, feature_name, dest_folder=base_dir_projet(),**kwargs):
     """
     Parcourt un dictionnaire de type {nom_source: url} et télécharge
     en fonction de la clé.
     """
-    dest_folder = Path(base_path) / feature_name
+    dest_folder = Path(dest_folder/"data/raw"/feature_name)
     dest_folder.mkdir(parents=True, exist_ok=True)
 
     print(f"\n--- Catégorie : {feature_name.upper()} ---")
@@ -171,12 +174,12 @@ def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw",*
             # Routage vers la fonction spéciale Arcep
             if key == "couvertures_theoriques":
                 print(f"Scan d'index détecté pour : {key}")
-                dest_folder = "../data/raw/reseau/couverture_theorique"
-                futures[executor.submit(download_from_index, url,dest_folder,filters=["4G", "5G"] )] = key
+                couv_folder = dest_folder / "couverture_theorique"
+                futures[executor.submit(download_from_index, url, couv_folder, filters=["4G", "5G"])] = key
 
             # Routage vers le téléchargement classique
             else:
-                futures[executor.submit(download_one, url, str(dest_folder))] = key
+                futures[executor.submit(download_one, url, dest_folder)] = key
 
         # Gestion des retours
         for future in as_completed(futures):
@@ -186,3 +189,7 @@ def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw",*
                 print(f"Terminé : {source_name}")
             except Exception as e:
                 print(f"Erreur sur '{source_name}': {e}")
+
+def chemin(dest_folder=base_dir_projet()):
+    dest_folder = Path(dest_folder / "data/raw" / "feature_name")
+    print(dest_folder)
