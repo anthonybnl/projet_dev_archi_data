@@ -18,3 +18,12 @@ mobilite:
 obligatoire:
   logement_sociaux: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/logements-sociaux-finances-a-paris/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
   valeur_fonciere: "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20260405-002321/valeursfoncieres-2025.txt.zip"
+
+AES:
+  ecoles_elementaires: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-ecoles-elementaires/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ecoles_maternelles: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-maternelles/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  colleges: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-colleges/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ecoles_effectifs: "https://www.data.gouv.fr/api/1/datasets/r/8a0b8d35-fea2-4c8d-9af1-fb25edb16980"
+  etablissements_hospitaliers: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/les_etablissements_hospitaliers_franciliens/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  services_sante: "https://www.data.gouv.fr/api/1/datasets/r/e405ce09-6d40-4505-835b-3f10f33632ac"
+  population_par_age: "https://www.data.gouv.fr/api/1/datasets/r/b8ad4a63-a4e3-4ef2-af6e-b08ef3b8084d"
