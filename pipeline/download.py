@@ -11,7 +11,7 @@ from pathlib import Path
 # On spécifie le nom du fichier car il ne s'appelle pas ".env"
 #load_dotenv(dotenv_path="url.env")
 
-#################### DATA ####################
+#################### DATA LOAD ####################
 def load_config(config_file="url_data.yaml",**kwargs):
     with open(config_file, "r", encoding="utf-8") as f:
         # safe_load empêche l'exécution de code arbitraire dans le YAML

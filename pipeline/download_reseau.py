@@ -5,7 +5,6 @@ from download import download_from_index, download_one, load_config
 feature_name = "reseau"
 data_url = load_config()
 feature_data = data_url[feature_name]
-print(feature_data.values())
 
 urls_simples = [v for v in feature_data.values() if v]
 

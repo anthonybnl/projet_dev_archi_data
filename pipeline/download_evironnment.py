@@ -1,13 +1,9 @@
-import py7zr
-import geopandas as gpd
-from shapely.geometry import box
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from download import download_one, load_config
 
 feature_name = "environnement"
 data_url = load_config()
 feature_data = data_url[feature_name]
-print(feature_data.values())
 
 urls_simples = [v for v in feature_data.values() if v]
 
