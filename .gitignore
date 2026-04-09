@@ -1,0 +1,62 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Environnement Virtuel ---
+.venv/
+venv/
+ENV/
+env/
+bin/
+include/
+lib/
+
+# --- Variables d'Environnement (Sécurité) ---
+.env
+url.env
+*.env
+!*.env.example
+
+# --- Données (Data Lakehouse) ---
+# On ignore les données téléchargées en local pour ne pas saturer Git
+data/
+../data/
+*.zip
+*.7z
+*.csv
+*.parquet
+*.json
+
+# --- Docker ---
+.docker/
+# Si tu ne veux pas versionner les données persistantes de Postgres :
+postgres_data/
+
+# --- IDE (VS Code, PyCharm) ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+# -- DATA --
+/data/
