@@ -39,10 +39,11 @@ export default function Map({ selectedIndicator }: Props) {
         map.addControl(new maplibregl.NavigationControl(), 'top-right')
 
         map.on('load', async () => {
-            const [geojson, scores]: [FeatureCollection<Geometry>, ScoresMap] =
+            const [geojson, scores, espacesVerts]: [FeatureCollection<Geometry>, ScoresMap, FeatureCollection<Geometry>] =
                 await Promise.all([
-                    fetch(`${API}/features/`).then(r => r.json()),
+                    fetch(`${API}/arrondissements/`).then(r => r.json()),
                     fetch(`${API}/scores/`).then(r => r.json()),
+                    fetch(`${API}/environnement/espaces_verts`).then(r => r.json()),
                 ])
 
             // Injection de tous les scores dans les propriétés de chaque feature
@@ -63,6 +64,7 @@ export default function Map({ selectedIndicator }: Props) {
             }
 
             map.addSource('arrondissements', { type: 'geojson', data: enriched })
+            map.addSource('espaces_verts', { type: 'geojson', data: espacesVerts })
 
             map.addLayer({
                 id: 'arrondissements-fill',
@@ -86,6 +88,17 @@ export default function Map({ selectedIndicator }: Props) {
                     'line-opacity': 0.8,
                 },
             })
+
+                map.addLayer({
+                id: 'espaces-verts',
+                type: 'fill',
+                source: 'espaces_verts',
+                paint: {
+                    'fill-color': '#1eb600',
+                    'fill-opacity': 0.8,
+                },
+            })
+
 
             // Popup au survol
             const popup = new maplibregl.Popup({ closeButton: false, closeOnClick: false })
