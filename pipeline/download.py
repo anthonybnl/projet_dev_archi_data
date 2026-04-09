@@ -67,7 +67,7 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
         print(f"Erreur : Le fichier {file_path} n'existe pas.")
         return False
 
-    def change_extension(zipfile, file_path):
+    def change_extension(zipfile, file_path, **kwargs):
         with zipfile.ZipFile(file_path, 'r') as zip_ref:
             # On parcourt chaque fichier dans l'archive
             for member in zip_ref.namelist():
@@ -80,7 +80,7 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
                     new_file = extracted_file.with_suffix('.csv')
                     # Renomme uniquement si le fichier .csv n'existe pas déjà
                     extracted_file.replace(new_file)
-                    print(f"Renommé : {extracted_file.name} -> {new_file.name}")
+                    print(f"Renommé : {extracted_file.name} en {new_file.name}")
 
     compressed_extensions = ['.zip', '.7z', '.rar', '.gz']
 
@@ -89,10 +89,9 @@ def function_unzip(file_path, extract_to="../data/raw",**kwargs):
         return True
 
     try:
-        # On crée un sous-dossier au nom du fichier pour éviter de mélanger les fichiers extraits
         final_dest = extract_path
         final_dest.mkdir(parents=True, exist_ok=True)
-
+        # Verification si le s'est un fichier compresser
         if file_path.suffix.lower() == '.zip':
             with zipfile.ZipFile(file_path, 'r') as zip_ref:
                 zip_ref.extractall(final_dest)
@@ -127,7 +126,7 @@ def download_from_index(index_url, dest_folder="../data/raw", filters=None, **kw
         file_links = [l for l in file_links if any(f in l for f in filters)]
 
     if not file_links:
-        print(f"[SKIP] Aucun fichier trouve avec les filtres {filters}")
+        print(f"[SKIP] Aucun fichier trouver avec les filtres {filters}")
         return []
 
     print(f"[INFO] {len(file_links)} fichier(s) a telecharger en parallele...")
@@ -155,7 +154,7 @@ def download_one(url,dest_folder, **kwargs):
     function_unzip(path,dest_folder)
 
 #################### PARALLELISATION ####################
-def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw"):
+def parallel_download_routing(urls_dict, feature_name, base_path="../data/raw",**kwargs):
     """
     Parcourt un dictionnaire de type {nom_source: url} et télécharge
     en fonction de la clé.
