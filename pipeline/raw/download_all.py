@@ -1,4 +1,4 @@
-from download import load_config,parallel_download_routing, chemin
+from download import load_config,parallel_download_routing
 
 config = load_config()
 #print(chemin())

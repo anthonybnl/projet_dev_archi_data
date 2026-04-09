@@ -190,6 +190,3 @@ def parallel_download_routing(urls_dict, feature_name, dest_folder=base_dir_proj
             except Exception as e:
                 print(f"Erreur sur '{source_name}': {e}")
 
-def chemin(dest_folder=base_dir_projet()):
-    dest_folder = Path(dest_folder / "data/raw" / "feature_name")
-    print(dest_folder)
