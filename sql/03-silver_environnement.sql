@@ -21,5 +21,13 @@ CREATE TABLE "silver"."ilots_fraicheur" (
     nom TEXT,
     code_postal INT,
     geo_shape TEXT,
+    code_iris TEXT,
+    PRIMARY KEY (id, code_postal)
+);
+
+CREATE TABLE "silver"."trilib" (
+    id INT PRIMARY KEY,
+    arrondissement INT,
+    geo_shape TEXT,
     code_iris TEXT
 );

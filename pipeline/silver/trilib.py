@@ -37,23 +37,23 @@ def get_engine_sql_alchemy():
 
 def charger_et_nettoyer_donnees():
 
-    df_ilots = pd.read_csv(
-        DATA_DIR / "environnement" / "ilots-de-fraicheur-equipements-activites.csv",
+    df_trilib = pd.read_csv(
+        DATA_DIR
+        / "environnement"
+        / "dechets-menagers-points-dapport-volontaire-stations-trilib.csv",
         sep=";",
     )
 
-    df_ilots = df_ilots[["IDENTIFIANT", "Nom", "Code postal", "geo_shape"]]
+    df_trilib = df_trilib[["Identifiant", "Arrondissement", "geo_shape"]]
 
-    df_ilots = df_ilots.rename(
+    df_trilib = df_trilib.rename(
         columns={
-            "IDENTIFIANT": "id",
-            "Nom": "nom",
-            "Code postal": "code_postal",
-            "geo_shape": "geo_shape",
+            "Identifiant": "id",
+            "Arrondissement": "arrondissement",
         }
     )
 
-    return df_ilots
+    return df_trilib
 
 
 def charger_iris():
@@ -81,7 +81,7 @@ def main():
 
     # on transforme en GeoDataFrame
     df["geometry"] = df["geo_shape"].apply(lambda s: shape(json.loads(s)))
-    
+
     gdf_ilots = gpd.GeoDataFrame(
         df,
         geometry="geometry",
@@ -92,7 +92,7 @@ def main():
 
     df = pd.DataFrame(gdf_joined.drop(columns=["geometry", "index_right"]))
 
-    print(f"Ilots avec code_iris manquant : {df['code_iris'].isna().sum()}")
+    print(f"Trilib avec code_iris manquant : {df['code_iris'].isna().sum()}")
 
     df = df[df["code_iris"].notna()]
 
@@ -102,13 +102,12 @@ def main():
 
     with engine.begin() as connection:
 
-        sql_data = pd.read_sql("SELECT id, code_postal FROM silver.ilots_fraicheur", con=connection)
+        sql_data = pd.read_sql("SELECT id FROM silver.trilib", con=connection)
 
         # on insère que les données qui ne sont pas déjà présentes dans la table
 
-        # jointure sur (id, code_postal) car id n'est pas unique dans la table (ex : MU75)
         df_merge = df.merge(
-            sql_data, on=["id", "code_postal"], how="left", indicator=True, suffixes=("", "_sql")
+            sql_data, on="id", how="left", indicator=True, suffixes=("", "_sql")
         )
         df_to_insert = df_merge[df_merge["_merge"] == "left_only"].drop(
             columns=["_merge"]
@@ -117,15 +116,15 @@ def main():
         if not df_to_insert.empty:
             print(f"Données à insérer : {len(df_to_insert)}")
             df_to_insert.to_sql(
-                "ilots_fraicheur",
+                "trilib",
                 con=connection,
                 if_exists="append",
                 index=False,
                 schema="silver",
             )
-            print("Données insérées dans la table 'ilots_fraicheur'")
+            print("Données insérées dans la table 'trilib'")
         else:
-            print("Aucune nouvelle donnée à insérer dans la table 'ilots_fraicheur'")
+            print("Aucune nouvelle donnée à insérer dans la table 'trilib'")
 
 
 if __name__ == "__main__":
