@@ -1,11 +1,11 @@
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_if_empty
 
 
 def run(engine):
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     _run_population_enfants(engine, schema)
     _run_population_totale(engine, schema)
 

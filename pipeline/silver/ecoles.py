@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_ignore
 
 
@@ -36,6 +36,6 @@ def run(engine):
     result["nb_eleves"] = result["nb_eleves"].astype(int)
     result["created_at"] = datetime.now()
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     insert_ignore(result, "elementaires_maternelles_effectifs", engine, schema)
     print(f"[silver.elementaires_maternelles_effectifs] {len(result)} écoles traitées (année {derniere_annee})")
