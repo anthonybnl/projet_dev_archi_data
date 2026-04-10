@@ -26,40 +26,41 @@ Score_final (100%)
     ├── Taux déploiement (60%)
     └── Taux PM actif (40%)
 ```
+# Méthodologie du Calcul de Score Réseau
+
 ## 1. Formule Globale
 Le score final est la somme pondérée des trois piliers principaux :
 
-$$Score_{Final} = (0,45 	imes S_{Mobile}) + (0,30 	imes S_{Qualité}) + (0,25 	imes S_{Fibre})$$
+$$Score_{Final} = (0,45 \times S_{Mobile}) + (0,30 \times S_{Qualité}) + (0,25 \times S_{Fibre})$$
 
 ---
 
 ## 2. Décomposition des Sous-Scores
+Chaque pilier est lui-même calculé selon ses propres indicateurs :
 
-### A. Score Mobile ($S_{Mobile}$) - Poids : 45%
-$$S_{Mobile} = (0,35 	imes C_{4G}) + (0,40 	imes C_{5G}) + (0,15 	imes N_{Couv}) + (0,10 	imes D_{Ant})$$
+### A. Score Mobile ($S_{Mobile}$)
+$$S_{Mobile} = (0,35 \times C_{4G}) + (0,40 \times C_{5G}) + (0,15 \times N_{Couv}) + (0,10 \times D_{Ant})$$
 
-* **Couverture 4G ($C_{4G}$)** : Taux de disponibilité de la technologie 4G (35%).
-* **Couverture 5G ($C_{5G}$)** : Taux de disponibilité de la technologie 5G (40%).
-* **Niveau de couverture ($N_{Couv}$)** : Puissance du signal (RSRP normalisé) (15%).
-* **Densité antennes ($D_{Ant}$)** : Nombre de supports actifs par zone (10%).
+* **$C_{4G} / C_{5G}$** : Taux de couverture (0 à 100%).
+* **$N_{Couv}$** : Niveau de signal (souvent basé sur le RSRP normalisé).
+* **$D_{Ant}$** : Nombre d'antennes par $km^2$ ou par habitant.
 
-### B. Score Qualité ($S_{Qualité}$) - Poids : 30%
-$$S_{Qualité} = (0,40 	imes D_{DL}) + (0,30 	imes F_{iab}) + (0,30 	imes L_{at})$$
+### B. Score Qualité ($S_{Qualité}$)
+$$S_{Qualité} = (0,40 \times D_{DL}) + (0,30 \times F_{iab}) + (0,30 \times L_{at})$$
 
-* **Débit DL médian ($D_{DL}$)** : Vitesse de téléchargement médiane (40%).
-* **Fiabilité ($F_{iab}$)** : Taux de réussite des tests / absence d'échecs (30%).
-* **Latence ($L_{at}$)** : Rapidité de réponse (Ping) - Score inverse (30%).
+* **$D_{DL}$** : Débit descendant médian.
+* **$F_{iab}$** : Taux de réussite des tests (Fiabilité).
+* **$L_{at}$** : Score de latence (inversement proportionnel au Ping).
 
-### C. Score Fibre ($S_{Fibre}$) - Poids : 25%
-$$S_{Fibre} = (0,60 	imes T_{Depl}) + (0,40 	imes T_{PM})$$
+### C. Score Fibre ($S_{Fibre}$)
+$$S_{Fibre} = (0,60 \times T_{Depl}) + (0,40 \times T_{PM})$$
 
-* **Taux déploiement ($T_{Depl}$)** : Pourcentage de locaux raccordables (60%).
-* **Taux PM actif ($T_{PM}$)** : Pourcentage de Points de Mutualisation activés (40%).
+* **$T_{Depl}$** : Taux de locaux raccordables.
+* **$T_{PM}$** : Taux de Points de Mutualisation actifs.
 
 ---
 
-## 3. Formule Développée Complète
-
+## 3. Formule Développée (Vue d'ensemble)
 $$
 \begin{aligned}
 Score = & \ 0,45 \times [0,35C_{4G} + 0,40C_{5G} + 0,15N_{Couv} + 0,10D_{Ant}] \\
@@ -67,3 +68,5 @@ Score = & \ 0,45 \times [0,35C_{4G} + 0,40C_{5G} + 0,15N_{Couv} + 0,10D_{Ant}] \
 & + 0,25 \times [0,60T_{Depl} + 0,40T_{PM}]
 \end{aligned}
 $$
+
+> **Note technique :** Pour les variables comme la Latence, n'oubliez pas d'utiliser une fonction de normalisation inverse (car une latence élevée doit faire baisser le score), par exemple : $100 - Latence_{mesurée}$ ou $1/Latence$
