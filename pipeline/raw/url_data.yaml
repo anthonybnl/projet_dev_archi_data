@@ -27,3 +27,6 @@ AES:
   etablissements_hospitaliers: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/les_etablissements_hospitaliers_franciliens/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
   services_sante: "https://www.data.gouv.fr/api/1/datasets/r/e405ce09-6d40-4505-835b-3f10f33632ac"
   population_par_age: "https://www.data.gouv.fr/api/1/datasets/r/b8ad4a63-a4e3-4ef2-af6e-b08ef3b8084d"
+
+map:
+  iris: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/iris/exports/geojson?lang=fr&timezone=Europe%2FBerlin"
