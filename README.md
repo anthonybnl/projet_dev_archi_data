@@ -11,21 +11,21 @@ Projet Développement Architecture de données.
 ![Architecture](doc/archi.svg)
 
 Cacule reseau:
-
+```text
 Score_final (100%)
-├── Score_Mobile     45%
-│   ├── Couverture 4G        35%
-│   ├── Couverture 5G        40%
-│   ├── Niveau couverture    15%
-│   └── Densité antennes     10%
-├── Score_Qualite    30%
-│   ├── Débit DL médian      40%
-│   ├── Fiabilité            30%
-│   └── Latence              30%
-└── Score_Fibre      25%
-    ├── Taux déploiement     60%
-    └── Taux PM actif        40%
-
+├── Score_Mobile (45%)
+│   ├── Couverture 4G (35%)
+│   ├── Couverture 5G (40%)
+│   ├── Niveau couverture (15%)
+│   └── Densité antennes (10%)
+├── Score_Qualite (30%)
+│   ├── Débit DL médian (40%)
+│   ├── Fiabilité (30%)
+│   └── Latence (30%)
+└── Score_Fibre (25%)
+    ├── Taux déploiement (60%)
+    └── Taux PM actif (40%)
+```
 ## 1. Formule Globale
 Le score final est la somme pondérée des trois piliers principaux :
 

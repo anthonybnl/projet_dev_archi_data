@@ -6,13 +6,18 @@ services:
     environment:
       POSTGRES_DB: urban_data
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
+      POSTGRES_PASSWORD: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - postgres_urban_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d:ro
     ports:
-      - "15000:5432"
+      - "5432:5432"
+
+  adminer:
+    image: adminer:5.4.0-standalone
+    ports:
+      - 8080:8080
 
 volumes:
   postgres_urban_data:
