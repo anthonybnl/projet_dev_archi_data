@@ -1,0 +1,33 @@
+# Configuration des sources de données (Architecture Médaillon - Raw Layer)
+reseau:
+  antennes: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/antennes-relais/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  couvertures_theoriques: "https://data.arcep.fr/mobile/couvertures_theoriques/last/Metropole/00_Metropole"
+  qos_habitations: "https://data.arcep.fr/mobile/mesures_qualite_arcep/last/Metropole/2025_QoS_Metropole_data_habitations.csv"
+  fibre: "https://data.arcep.fr/fixe/cartes_de_deploiement/last/carte_fibre_immeubles_2025_T4_20260130.csv"
+
+environnement:
+  arbres: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/les-arbres/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  espaces_verts: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/espaces_verts/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ilots_fraicheur: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/ilots-de-fraicheur-equipements-activites/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  dechets_trilib: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/dechets-menagers-points-dapport-volontaire-stations-trilib/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+
+mobilite:
+  velib: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-emplacement-des-stations/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  metro: "https://www.data.gouv.fr/api/1/datasets/r/5b645234-e6fd-4de8-889c-574a80531aca"
+  bus: "https://data.iledefrance-mobilites.fr/api/explore/v2.1/catalog/datasets/arrets-lignes/exports/csv?refine=nom_commune%3AParis"
+
+obligatoire:
+  logement_sociaux: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/logements-sociaux-finances-a-paris/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  valeur_fonciere: "https://static.data.gouv.fr/resources/demandes-de-valeurs-foncieres/20260405-002321/valeursfoncieres-2025.txt.zip"
+
+AES:
+  ecoles_elementaires: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-ecoles-elementaires/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ecoles_maternelles: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-maternelles/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  colleges: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-colleges/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  ecoles_effectifs: "https://www.data.gouv.fr/api/1/datasets/r/8a0b8d35-fea2-4c8d-9af1-fb25edb16980"
+  etablissements_hospitaliers: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/les_etablissements_hospitaliers_franciliens/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  services_sante: "https://www.data.gouv.fr/api/1/datasets/r/e405ce09-6d40-4505-835b-3f10f33632ac"
+  population_par_age: "https://www.data.gouv.fr/api/1/datasets/r/b8ad4a63-a4e3-4ef2-af6e-b08ef3b8084d"
+
+map:
+  iris: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/iris/exports/geojson?lang=fr&timezone=Europe%2FBerlin"
