@@ -15,3 +15,11 @@ CREATE TABLE "silver"."espaces_verts" (
     code_iris     TEXT,
     PRIMARY KEY (id, code_iris)
 );
+
+CREATE TABLE "silver"."ilots_fraicheur" (
+    id TEXT,
+    nom TEXT,
+    code_postal INT,
+    geo_shape TEXT,
+    code_iris TEXT
+);
