@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# Urban Data Explorer — Front
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface React + Vite + TypeScript pour explorer le marché du logement à Paris.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **TypeScript** + **Vite**
+- **MapLibre GL** pour la carte (tuiles OpenStreetMap, pas de clé API)
+- Polices Google : DM Sans
 
-## React Compiler
+## Démarrage
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd front
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Le front se lance sur http://localhost:5173
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+⚠️ Le front a besoin de l'API backend pour fonctionner. Lance-la avant :
+```bash
+# depuis la racine du projet
+uvicorn mock.api_indicateurs:app --reload --port 8000
 ```
+
+## Structure
+
+```
+src/
+├── App.tsx                   shell principal
+├── main.tsx                  entry point
+├── index.css                 reset + typo
+├── lib/
+│   ├── theme.ts              palette + rampe de couleurs
+│   ├── types.ts              types TS partagés
+│   ├── indicators.ts         définition des 4 indicateurs + helpers de format
+│   └── api.ts                client de l'API backend
+└── components/
+    ├── Header.tsx            barre du haut
+    ├── MapView.tsx           carte MapLibre (arrondissements + IRIS)
+    ├── Section.tsx           wrapper pliable
+    ├── Icons.tsx             pack d'icônes SVG
+    ├── IAIGauge.tsx          jauge colorée pour l'IAI
+    ├── SearchSection.tsx     barre de recherche
+    ├── IndicatorsSection.tsx checkboxes des 4 indicateurs
+    ├── TimelineSection.tsx   slider d'années
+    ├── DetailsSection.tsx    détails de la zone sélectionnée
+    └── CompareSection.tsx    comparaison de 2 zones épinglées
+```
+
+## Comportement de la carte
+
+- **Zoom < 13** : choroplèthe par arrondissement (20 zones)
+- **Zoom ≥ 13** : choroplèthe par IRIS (~992 zones)
+- **Plan / Satellite** : toggle pour basculer entre OSM et tuiles satellite Esri
+- **Hover** : tooltip avec le nom et la valeur de l'indicateur
+- **Click** : ouvre les détails de la zone dans la sidebar
