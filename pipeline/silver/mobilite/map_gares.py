@@ -1,7 +1,7 @@
 import geopandas as gpd
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_ignore
 
 
@@ -82,7 +82,7 @@ def run(engine):
     result = result.drop_duplicates(subset=["gare_id"], keep="first")
     result["created_at"] = datetime.now()
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     insert_ignore(result, "map_gares", engine, schema)
     print(f"[silver.map_gares] {len(result)} gares traitées")
     print(f"  → Gares avec IRIS: {result['code_iris'].notna().sum()}")

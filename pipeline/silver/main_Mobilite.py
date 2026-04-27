@@ -6,24 +6,13 @@ if not base_path in sys.path:
     sys.path.insert(0, str(base_path))
 
 from pipeline.db import get_engine
-from pipeline.silver.AES import (
-    ecoles,
-    colleges,
-    population,
-    sante,
-    map_scolaire,
-    map_sante,
-)
-
+from pipeline.silver.mobilite import map_arrets, map_gares, map_velib
 
 def run_silver(engine):
     print("\n=== SILVER ===")
-    ecoles.run(engine)
-    colleges.run(engine)
-    population.run(engine)
-    sante.run(engine)
-    map_scolaire.run(engine)
-    map_sante.run(engine)
+    map_arrets.run(engine)
+    map_gares.run(engine)
+    map_velib.run(engine)
 
 
 def main():
