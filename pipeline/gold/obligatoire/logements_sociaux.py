@@ -1,14 +1,16 @@
 import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
 import pandas as pd
 from sqlalchemy import text
-from db import engine
 
+root_path = Path(__file__).resolve().parents[3]
 
-def agreger_par_iris():
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
+
+from pipeline.db import get_engine
+
+def agreger_par_iris(engine):
     df = pd.read_sql("SELECT * FROM silver.logements_sociaux", engine)
     print(f"silver.logements_sociaux : {len(df)} lignes lues")
 
@@ -34,7 +36,7 @@ def agreger_par_iris():
     return gold
 
 
-def upsert_gold(gold):
+def upsert_gold(engine, gold):
     """Insert ou update dans gold — si le couple (code_iris, annee) existe déjà, on met à jour les valeurs."""
     # on utilise INSERT ... ON CONFLICT ... DO UPDATE de PostgreSQL
     upsert_sql = text("""
@@ -68,11 +70,12 @@ def upsert_gold(gold):
 
 
 def run():
-    gold = agreger_par_iris()
+    engine = get_engine()
+    gold = agreger_par_iris(engine)
     if len(gold) == 0:
         print("rien à insérer dans gold")
         return
-    upsert_gold(gold)
+    upsert_gold(engine, gold)
 
 
 if __name__ == "__main__":

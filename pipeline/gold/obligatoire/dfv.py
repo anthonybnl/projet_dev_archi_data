@@ -1,14 +1,18 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
 import pandas as pd
 from sqlalchemy import text
-from db import engine
+
+root_path = Path(__file__).resolve().parents[3]
+
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
+
+from pipeline.db import get_engine
 
 
-def agreger_par_iris():
+def agreger_par_iris(engine):
     df = pd.read_sql("SELECT * FROM silver.dvf", engine)
     print(f"silver.dvf : {len(df)} lignes lues")
 
@@ -43,7 +47,7 @@ def agreger_par_iris():
     return gold
 
 
-def upsert_gold(gold):
+def upsert_gold(engine, gold):
     upsert_sql = text("""
         INSERT INTO gold.indicateurs_dvf_iris
             (code_iris, annee, arrondissement, nb_transactions, prix_m2_median, prix_m2_moyen, nb_appartements, nb_maisons)
@@ -75,11 +79,12 @@ def upsert_gold(gold):
 
 
 def run():
-    gold = agreger_par_iris()
+    engine = get_engine()
+    gold = agreger_par_iris(engine)
     if len(gold) == 0:
         print("rien à insérer dans gold")
         return
-    upsert_gold(gold)
+    upsert_gold(engine, gold)
 
 
 if __name__ == "__main__":

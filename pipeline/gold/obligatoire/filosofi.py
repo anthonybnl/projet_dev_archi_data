@@ -1,14 +1,20 @@
 import sys
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
 import pandas as pd
 from sqlalchemy import text
-from db import engine
+
+root_path = Path(__file__).resolve().parents[3]
+
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
+
+from pipeline.db import get_engine
 
 
-def calculer_iai():
+
+def calculer_iai(engine):
+    """IAI = Indice d'Accessibilité à l'Immobilier — ratio entre le prix au m² et le revenu médian."""
+    
     df_filo = pd.read_sql("SELECT * FROM silver.filosofi", engine)
     print(f"silver.filosofi : {len(df_filo)} lignes lues")
 
@@ -85,7 +91,7 @@ def croiser_annees_proches(df_filo, df_dvf):
     return gold
 
 
-def upsert_gold(gold):
+def upsert_gold(engine, gold):
     upsert_sql = text("""
         INSERT INTO gold.indicateurs_socio_eco_iris
             (code_iris, annee, arrondissement, revenu_median, prix_m2_median, iai)
@@ -113,11 +119,12 @@ def upsert_gold(gold):
 
 
 def run():
-    gold = calculer_iai()
+    engine = get_engine()
+    gold = calculer_iai(engine)
     if len(gold) == 0:
         print("rien à insérer dans gold")
         return
-    upsert_gold(gold)
+    upsert_gold(engine, gold)
 
 
 if __name__ == "__main__":
