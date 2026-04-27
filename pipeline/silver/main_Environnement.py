@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from pipeline.silver import arbres, espaces_verts, ilots_fraicheur, trilib
+from pipeline.silver.environnement import arbres, espaces_verts, ilots_fraicheur, trilib
 
 def main():
     arbres.main()
