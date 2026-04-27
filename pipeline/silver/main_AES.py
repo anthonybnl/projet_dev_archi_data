@@ -1,10 +1,9 @@
 import sys
 from pathlib import Path
 
-base_path = Path(__file__).resolve().parents[2]
-
-if not str(base_path) in sys.path:
-    sys.path.append(str(base_path))
+base_path = str(Path(__file__).resolve().parents[2])
+if not base_path in sys.path:
+    sys.path.insert(0, base_path)
 
 from pipeline.db import get_engine
 from pipeline.silver.AES import (
