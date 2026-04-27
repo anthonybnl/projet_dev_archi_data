@@ -3,21 +3,25 @@ import hashlib
 import time
 import io
 from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent.parent))
-
 import requests as req
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
-from config import DATA_RAW, DATA_REFERENTIELS
-from db import engine
+
+root_path = Path(__file__).resolve().parents[3]
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
+
+from pipeline.config import RAW_DIR, IRIS_PATH
+from pipeline.db import get_engine
 
 # on liste tous les fichiers DVF (.txt et .csv, même format séparateur |)
-DVF_FILES = sorted(DATA_RAW.glob("ValeursFoncieres-*"))
+OBLIGATOIRE_DIR = RAW_DIR / "obligatoire"
+DVF_FILES = sorted(OBLIGATOIRE_DIR.glob("ValeursFoncieres-*"))
 
-# même fichier IRIS que le pipeline logements sociaux, déjà téléchargé normalement
-IRIS_PATH = DATA_REFERENTIELS / "contours-iris-france.geojson"
+if not IRIS_PATH.exists():
+    raise FileNotFoundError(f"fichier IRIS introuvable ({IRIS_PATH})")
+
 
 # API Géoplateforme (remplace l'ancienne api-adresse.data.gouv.fr)
 GEOCODE_URL = "https://data.geopf.fr/geocodage/search/csv"
@@ -264,7 +268,7 @@ def enrichir_iris(df):
     return df_resultat
 
 
-def filtrer_nouvelles_lignes(df):
+def filtrer_nouvelles_lignes(engine, df):
     """Ne garde que les lignes dont l'id_mutation n'est pas déjà en base."""
     ids_existants = pd.read_sql(
         "SELECT id_mutation FROM silver.dvf",
@@ -278,7 +282,8 @@ def filtrer_nouvelles_lignes(df):
     return df_nouvelles
 
 
-def inserer_silver(df):
+def inserer_silver(engine, df):
+
     colonnes_table = [
         "id_mutation", "date_mutation", "nature_mutation", "valeur_fonciere",
         "no_voie", "type_voie", "voie", "code_postal", "commune",
@@ -301,8 +306,10 @@ def inserer_silver(df):
 
 def run():
     if not DVF_FILES:
-        print("aucun fichier DVF trouvé dans data/raw/")
+        print("aucun fichier DVF trouvé dans data/raw/dvf")
         return
+    
+    engine = get_engine()
 
     print(f"{len(DVF_FILES)} fichiers DVF trouvés")
 
@@ -316,7 +323,7 @@ def run():
             continue
 
         df = nettoyer_dvf(df)
-        df = filtrer_nouvelles_lignes(df)
+        df = filtrer_nouvelles_lignes(engine, df)
 
         if len(df) == 0:
             print("  aucune nouvelle ligne à insérer")
@@ -324,7 +331,7 @@ def run():
 
         df = geocoder_batch(df)
         df = enrichir_iris(df)
-        inserer_silver(df)
+        inserer_silver(engine, df)
 
 
 if __name__ == "__main__":

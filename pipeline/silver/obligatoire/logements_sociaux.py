@@ -8,15 +8,18 @@ import requests as req
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
-from config import DATA_RAW, DATA_REFERENTIELS
-from db import engine
 
-CSV_PATH = DATA_RAW / "logements-sociaux-finances-a-paris.csv"
+root_path = Path(__file__).resolve().parents[3]
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
 
-# on utilise le GeoJSON des contours IRIS de data.gouv.fr
-# plus léger qu'un shapefile et geopandas le lit directement
-IRIS_URL = "https://www.data.gouv.fr/api/1/datasets/r/ae0e58f0-1cfd-489f-afa5-87fbbb1669f9"
-IRIS_PATH = DATA_REFERENTIELS / "contours-iris-france.geojson"
+from pipeline.config import IRIS_PATH, PATHS
+from pipeline.db import get_engine
+
+if not IRIS_PATH.exists():
+    raise FileNotFoundError(f"fichier IRIS introuvable ({IRIS_PATH})")
+
+CSV_PATH = PATHS["logements_sociaux"]
 
 # mapping des colonnes brutes vers des noms propres en snake_case
 RENAME_COLS = {
@@ -153,7 +156,7 @@ def enrichir_iris(df):
     return df_resultat
 
 
-def filtrer_nouvelles_lignes(df):
+def filtrer_nouvelles_lignes(engine, df):
     """Ne garde que les lignes dont l'identifiant_livraison n'est pas déjà en base."""
     ids_existants = pd.read_sql(
         "SELECT identifiant_livraison FROM silver.logements_sociaux",
@@ -167,7 +170,7 @@ def filtrer_nouvelles_lignes(df):
     return df_nouvelles
 
 
-def inserer_silver(df):
+def inserer_silver(engine, df):
     # on s'assure que les colonnes sont dans le bon ordre et qu'on n'envoie que ce que la table attend
     colonnes_table = [
         "identifiant_livraison", "adresse", "code_postal", "ville",
@@ -189,15 +192,16 @@ def inserer_silver(df):
 
 
 def run():
+    engine = get_engine()
     df = lire_et_nettoyer_csv()
     df = enrichir_iris(df)
-    df = filtrer_nouvelles_lignes(df)
+    df = filtrer_nouvelles_lignes(engine, df)
 
     if len(df) == 0:
         print("aucune nouvelle ligne à insérer")
         return
 
-    inserer_silver(df)
+    inserer_silver(engine, df)
 
 
 if __name__ == "__main__":

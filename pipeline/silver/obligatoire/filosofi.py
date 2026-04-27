@@ -5,16 +5,21 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 import pandas as pd
-from config import DATA_RAW
-from db import engine
 
-FILOSOFI_DIR = DATA_RAW / "filosofi"
+root_path = Path(__file__).resolve().parents[3]
+if not str(root_path) in sys.path:
+    sys.path.insert(0, str(root_path))
+
+from pipeline.config import RAW_DIR
+from pipeline.db import get_engine
+
+OBLIGATOIRE_DIR = RAW_DIR / "obligatoire"
 
 
 def trouver_fichiers():
     """Trouve les CSV Filosofi et extrait l'année depuis le nom de fichier."""
     fichiers = {}
-    for csv_path in sorted(FILOSOFI_DIR.glob("*.csv")):
+    for csv_path in sorted(OBLIGATOIRE_DIR.glob("BASE_TD_FILO_DISP_IRIS_*.csv")):
         # le nom contient l'année : BASE_TD_FILO_..._2021_DISP.csv ou BASE_TD_FILO_DISP_..._2020.csv
         match = re.search(r"(20\d{2})", csv_path.name)
         if match:
@@ -61,7 +66,7 @@ def lire_et_nettoyer(csv_path, annee):
     return df
 
 
-def filtrer_nouvelles_lignes(df):
+def filtrer_nouvelles_lignes(engine, df):
     existants = pd.read_sql(
         "SELECT code_iris, annee FROM silver.filosofi",
         engine,
@@ -76,7 +81,7 @@ def filtrer_nouvelles_lignes(df):
     return df_nouvelles
 
 
-def inserer_silver(df):
+def inserer_silver(engine, df):
     colonnes_table = ["code_iris", "annee", "revenu_median", "arrondissement"]
     df = df[colonnes_table]
 
@@ -91,6 +96,8 @@ def inserer_silver(df):
 
 
 def run():
+    engine = get_engine()
+
     fichiers = trouver_fichiers()
 
     if not fichiers:
@@ -109,13 +116,13 @@ def run():
         return
 
     df_total = pd.concat(tous_les_df, ignore_index=True)
-    df_total = filtrer_nouvelles_lignes(df_total)
+    df_total = filtrer_nouvelles_lignes(engine, df_total)
 
     if len(df_total) == 0:
         print("aucune nouvelle ligne à insérer")
         return
 
-    inserer_silver(df_total)
+    inserer_silver(engine, df_total)
 
 
 if __name__ == "__main__":
