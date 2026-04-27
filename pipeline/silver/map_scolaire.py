@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_ignore
 
 
@@ -58,7 +58,7 @@ def run(engine):
     # Réordonner les colonnes avec id en premier
     result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "created_at"]]
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     insert_ignore(result, "map_scolaire", engine, schema)
     print(f"[silver.map_scolaire] {len(result)} établissements traités")
     print(f"  → Répartition : {result['type'].value_counts().to_dict()}")

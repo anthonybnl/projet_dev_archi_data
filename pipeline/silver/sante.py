@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_if_empty
 
 BPE_COLS = {
@@ -36,7 +36,7 @@ def run(engine):
     result = df[["arrondissement", "nb_medecins", "nb_infirmiers", "nb_centres_sante", "nb_pharmacies"]].copy()
     result["created_at"] = datetime.now()
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     inserted = insert_if_empty(result, "sante_paris", engine, schema)
     if inserted:
         print(f"[silver.sante_paris] {len(result)} arrondissements insérés")

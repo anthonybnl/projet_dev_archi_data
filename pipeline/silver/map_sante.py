@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_ignore
 
 
@@ -43,7 +43,7 @@ def run(engine):
     result["arrondissement"] = result["arrondissement"].astype(int)
     result["created_at"] = datetime.now()
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     insert_ignore(result, "map_sante", engine, schema)
     print(f"[silver.map_sante] {len(result)} établissements traités")
     print(f"  → Top catégories : {result['categorie'].value_counts().head(5).to_dict()}")
