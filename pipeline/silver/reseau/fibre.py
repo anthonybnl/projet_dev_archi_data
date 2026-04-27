@@ -6,7 +6,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape, Point
 
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_if_empty
 
 warnings.filterwarnings("ignore")
@@ -159,7 +159,7 @@ def run(engine):
 
     result["created_at"] = datetime.now()
 
-    schema = LAYERS["silver_schema"]
+    schema = "silver"
     inserted = insert_if_empty(result, "reseau_fibre", engine, schema)
     if inserted:
         print(f"[silver.reseau_fibre] {len(result)} IRIS inseres")

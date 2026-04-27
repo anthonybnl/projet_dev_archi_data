@@ -7,7 +7,7 @@ import geopandas as gpd
 import pandas as pd
 from shapely.geometry import shape
 
-from pipeline.config import PATHS, LAYERS
+from pipeline.config import PATHS
 from pipeline.db import insert_if_empty
 
 warnings.filterwarnings("ignore")
@@ -217,7 +217,7 @@ def run(engine):
 
     result = build_result(couv, densite)
 
-    schema   = LAYERS["silver_schema"]
+    schema   = "silver"
     inserted = insert_if_empty(result, "reseau_mobile", engine, schema)
     if inserted:
         print(f"[silver.reseau_mobile] {len(result)} lignes inserees")
