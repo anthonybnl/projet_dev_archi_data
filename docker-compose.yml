@@ -3,6 +3,8 @@ services:
     image: postgres:15-alpine
     container_name: postgres_urban_data
     restart: unless-stopped
+    networks:
+      - base_de_donnee
     environment:
       POSTGRES_DB: urban_data
       POSTGRES_USER: postgres
@@ -12,12 +14,60 @@ services:
       - postgres_urban_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d:ro
     ports:
-      - "5432:5432"
+      - 5432:5432
+
+  mongo:
+    image: mongo
+    container_name: mongo_db
+    restart: always
+    networks:
+      - base_de_donnee
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: postgres
+      MONGO_INITDB_DATABASE: urban_data
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    restart: always
+    networks:
+      - base_de_donnee
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:postgres@mongo:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: postgres
+
 
   adminer:
-    image: adminer:5.4.0-standalone
+    image: adminer:latest
+    container_name: adminer_ui
+    restart: unless-stopped
+    networks:
+      - base_de_donnee
     ports:
       - 8080:8080
 
+  dbgate:
+    image: dbgate/dbgate:latest
+    container_name: dbgate_universal
+    restart: always
+    ports:
+      - 3000:3000 # Accès via http://localhost:3000
+    networks:
+      - base_de_donnee
+
+networks:
+  base_de_donnee:
+    driver: bridge
+
 volumes:
   postgres_urban_data:
+  mongo-data:
