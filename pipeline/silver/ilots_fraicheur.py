@@ -71,6 +71,7 @@ def charger_iris():
 
 
 def main():
+    print("=== Pipeline Silver - Ilots de Fraicheur ===")
     gdf_iris = charger_iris()
 
     print(f"IRIS chargés : {len(gdf_iris)}")
@@ -81,7 +82,7 @@ def main():
 
     # on transforme en GeoDataFrame
     df["geometry"] = df["geo_shape"].apply(lambda s: shape(json.loads(s)))
-    
+
     gdf_ilots = gpd.GeoDataFrame(
         df,
         geometry="geometry",
@@ -102,13 +103,19 @@ def main():
 
     with engine.begin() as connection:
 
-        sql_data = pd.read_sql("SELECT id, code_postal FROM silver.ilots_fraicheur", con=connection)
+        sql_data = pd.read_sql(
+            "SELECT id, code_postal FROM silver.ilots_fraicheur", con=connection
+        )
 
         # on insère que les données qui ne sont pas déjà présentes dans la table
 
         # jointure sur (id, code_postal) car id n'est pas unique dans la table (ex : MU75)
         df_merge = df.merge(
-            sql_data, on=["id", "code_postal"], how="left", indicator=True, suffixes=("", "_sql")
+            sql_data,
+            on=["id", "code_postal"],
+            how="left",
+            indicator=True,
+            suffixes=("", "_sql"),
         )
         df_to_insert = df_merge[df_merge["_merge"] == "left_only"].drop(
             columns=["_merge"]

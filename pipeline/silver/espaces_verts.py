@@ -46,7 +46,7 @@ def charger_et_nettoyer_donnees():
             "Code postal",
             "Superficie totale réelle",
             "Année de l'ouverture",
-            "Geo Shape"
+            "Geo Shape",
         ]
     ]
 
@@ -57,9 +57,10 @@ def charger_et_nettoyer_donnees():
             "Code postal": "code_postal",
             "Superficie totale réelle": "superficie",
             "Année de l'ouverture": "annee",
-            "Geo Shape": "geo_shape"
-        })
-    
+            "Geo Shape": "geo_shape",
+        }
+    )
+
     # on filtre sur les NA
     columns_to_check = ["id", "code_postal", "geo_shape"]
     df_espaces_verts = df_espaces_verts.dropna(subset=columns_to_check, how="any")
@@ -89,6 +90,7 @@ def charger_iris():
 
 
 def main():
+    print("=== Pipeline Silver - Espaces Verts ===")
     gdf_iris = charger_iris()
 
     print(f"IRIS chargés : {len(gdf_iris)}")
@@ -99,7 +101,9 @@ def main():
 
     # Conversion de la colonne geo_shape (GeoJSON string) en geometry shapely
     df["geometry"] = df["geo_shape"].apply(lambda s: shape(json.loads(s)))
-    gdf_ev = gpd.GeoDataFrame(df.drop(columns=["geo_shape"]), geometry="geometry", crs="EPSG:4326")
+    gdf_ev = gpd.GeoDataFrame(
+        df.drop(columns=["geo_shape"]), geometry="geometry", crs="EPSG:4326"
+    )
 
     # Jointure spatiale
     gdf_joined = gpd.sjoin(gdf_ev, gdf_iris, how="left", predicate="intersects")
@@ -123,7 +127,9 @@ def main():
         df_merge = df.merge(
             sql_data, on="id", how="left", indicator=True, suffixes=("", "_sql")
         )
-        df_to_insert = df_merge[df_merge["_merge"] == "left_only"].drop(columns=["_merge"])
+        df_to_insert = df_merge[df_merge["_merge"] == "left_only"].drop(
+            columns=["_merge"]
+        )
 
         if not df_to_insert.empty:
             print(f"Données à insérer : {len(df_to_insert)}")

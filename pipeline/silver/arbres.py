@@ -80,6 +80,7 @@ def charger_iris():
 
 
 def main():
+    print("=== Pipeline Silver - Arbres ===")
     gdf_iris = charger_iris()
 
     print(f"IRIS chargés : {len(gdf_iris)}")
@@ -97,7 +98,9 @@ def main():
 
     gdf_joined = gpd.sjoin(gdf_arbres, gdf_iris, how="left", predicate="within")
 
-    df = gdf_joined[["id", "arrondissement", "latitude", "longitude", "code_iris"]].copy()
+    df = gdf_joined[
+        ["id", "arrondissement", "latitude", "longitude", "code_iris"]
+    ].copy()
 
     print(f"Arbres avec code_iris manquant : {df['code_iris'].isna().sum()}")
 

@@ -71,6 +71,7 @@ def charger_iris():
 
 
 def main():
+    print("=== Pipeline Silver - Trilib ===")
     gdf_iris = charger_iris()
 
     print(f"IRIS chargés : {len(gdf_iris)}")
