@@ -35,8 +35,12 @@ def insert_ignore(df, table_name, engine, schema):
 
     metadata = MetaData()
     table = Table(table_name, metadata, schema=schema, autoload_with=engine)
-    records = df.to_dict(orient="records")
-    stmt = pg_insert(table).values(records).on_conflict_do_nothing()
+
+    # Remplacer NaN/NaT par None pour PostgreSQL
+    df = df.astype(object).where(df.notna(), other=None)
+
     with engine.connect() as conn:
-        conn.execute(stmt)
+        for record in df.to_dict(orient="records"):
+            stmt = pg_insert(table).values(record).on_conflict_do_nothing()
+            conn.execute(stmt)
         conn.commit()
