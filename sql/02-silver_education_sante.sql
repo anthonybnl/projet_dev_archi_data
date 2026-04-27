@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS silver.colleges_paris (
     arrondissement  SMALLINT        NOT NULL,
     lat             DOUBLE PRECISION,
     lon             DOUBLE PRECISION,
+    code_iris       INTEGER,
+    nom_iris        VARCHAR(255),
     created_at      TIMESTAMP       NOT NULL DEFAULT NOW()
 );
 
@@ -32,6 +34,8 @@ CREATE TABLE IF NOT EXISTS silver.map_sante (
     arrondissement      SMALLINT        NOT NULL,
     lat                 DOUBLE PRECISION,
     lon                 DOUBLE PRECISION,
+    code_iris           INTEGER,
+    nom_iris            VARCHAR(255),
     created_at          TIMESTAMP       NOT NULL DEFAULT NOW(),
     CONSTRAINT uq_map_sante_finess UNIQUE (finess)
 );
@@ -44,6 +48,8 @@ CREATE TABLE IF NOT EXISTS silver.map_scolaire (
     arrondissement  SMALLINT        NOT NULL,
     lat             DOUBLE PRECISION,
     lon             DOUBLE PRECISION,
+    code_iris       INTEGER,
+    nom_iris        VARCHAR(255),
     created_at      TIMESTAMP       NOT NULL DEFAULT NOW()
 );
 
