@@ -15,8 +15,6 @@ def run_silver(engine):
     sante.run(engine)
     map_scolaire.run(engine)
     map_sante.run(engine)
-
-    # Réseau: les trois tables doivent être insérées avant le score gold
     reseau_mobile.run(engine)
     reseau_qualite.run(engine)
     reseau_fibre.run(engine)
@@ -24,7 +22,6 @@ def run_silver(engine):
 
 def run_gold(engine):
     print("\n=== GOLD ===")
-    # Lit les tables silver reseau_* et produit le score final par IRIS
     score_reseau.run(engine)
 
 
@@ -32,7 +29,7 @@ def main():
     engine = get_engine()
     init_db.run(engine)
     run_silver(engine)
-    #run_gold(engine)
+    run_gold(engine)
     print("\nPipeline termine.")
 
 
