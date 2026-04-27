@@ -7,7 +7,7 @@ import geopandas as gpd
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parents[2]  # on remonte de 3 niveaux
+BASE_DIR = Path(__file__).resolve().parents[3]  # on remonte de 3 niveaux
 DATA_DIR = BASE_DIR / "data" / "raw"
 
 

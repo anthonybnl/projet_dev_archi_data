@@ -1,15 +1,17 @@
+import json
+
 import pandas as pd
 from pathlib import Path
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
-import json
 import geopandas as gpd
 from shapely.geometry import shape
 
+
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parents[2]  # on remonte de 3 niveaux
+BASE_DIR = Path(__file__).resolve().parents[3]  # on remonte de 3 niveaux
 
 DATA_DIR = BASE_DIR / "data" / "raw"
 
@@ -35,44 +37,23 @@ def get_engine_sql_alchemy():
 
 def charger_et_nettoyer_donnees():
 
-    df_espaces_verts = pd.read_csv(
-        DATA_DIR / "environnement" / "espaces_verts.csv", sep=";"
+    df_trilib = pd.read_csv(
+        DATA_DIR
+        / "environnement"
+        / "dechets-menagers-points-dapport-volontaire-stations-trilib.csv",
+        sep=";",
     )
 
-    df_espaces_verts = df_espaces_verts[
-        [
-            "Identifiant espace vert",
-            "Nom de l'espace vert",
-            "Code postal",
-            "Superficie totale réelle",
-            "Année de l'ouverture",
-            "Geo Shape",
-        ]
-    ]
+    df_trilib = df_trilib[["Identifiant", "Arrondissement", "geo_shape"]]
 
-    df_espaces_verts = df_espaces_verts.rename(
+    df_trilib = df_trilib.rename(
         columns={
-            "Identifiant espace vert": "id",
-            "Nom de l'espace vert": "nom",
-            "Code postal": "code_postal",
-            "Superficie totale réelle": "superficie",
-            "Année de l'ouverture": "annee",
-            "Geo Shape": "geo_shape",
+            "Identifiant": "id",
+            "Arrondissement": "arrondissement",
         }
     )
 
-    # on filtre sur les NA
-    columns_to_check = ["id", "code_postal", "geo_shape"]
-    df_espaces_verts = df_espaces_verts.dropna(subset=columns_to_check, how="any")
-
-    # valeurs abérentes : année 9999, on les remplace par des NA
-    df_espaces_verts.loc[df_espaces_verts["annee"] == 9999, "annee"] = None
-
-    # valeurs absentes : on les remplace par la médiane
-    annee_mediane = df_espaces_verts["annee"].median()
-    df_espaces_verts.loc[df_espaces_verts["annee"].isna(), "annee"] = annee_mediane
-
-    return df_espaces_verts
+    return df_trilib
 
 
 def charger_iris():
@@ -90,40 +71,42 @@ def charger_iris():
 
 
 def main():
-    print("=== Pipeline Silver - Espaces Verts ===")
+    print("=== Pipeline Silver - Trilib ===")
     gdf_iris = charger_iris()
 
     print(f"IRIS chargés : {len(gdf_iris)}")
 
     df = charger_et_nettoyer_donnees()
 
-    print(f"Données espaces verts chargées et nettoyées : {len(df)}")
+    print(f"Données ilots chargées et nettoyées : {len(df)}")
 
-    # Conversion de la colonne geo_shape (GeoJSON string) en geometry shapely
+    # on transforme en GeoDataFrame
     df["geometry"] = df["geo_shape"].apply(lambda s: shape(json.loads(s)))
-    gdf_ev = gpd.GeoDataFrame(
-        df.drop(columns=["geo_shape"]), geometry="geometry", crs="EPSG:4326"
+
+    gdf_ilots = gpd.GeoDataFrame(
+        df,
+        geometry="geometry",
+        crs="EPSG:4326",
     )
 
-    # Jointure spatiale
-    gdf_joined = gpd.sjoin(gdf_ev, gdf_iris, how="left", predicate="intersects")
+    gdf_joined = gpd.sjoin(gdf_ilots, gdf_iris, how="left", predicate="within")
 
     df = pd.DataFrame(gdf_joined.drop(columns=["geometry", "index_right"]))
 
-    nb_sans_iris = df["code_iris"].isna().sum()
-    print(f"Espaces verts sans IRIS : {nb_sans_iris}")
-    print(f"Lignes après jointure (avec dédoublons IRIS) : {len(df)}")
+    print(f"Trilib avec code_iris manquant : {df['code_iris'].isna().sum()}")
 
-    # on retire ceux qui n'ont pas d'IRIS
     df = df[df["code_iris"].notna()]
+
+    print(f"Données après suppression code_iris manquant : {len(df)}")
 
     engine = get_engine_sql_alchemy()
 
     with engine.begin() as connection:
 
-        sql_data = pd.read_sql("SELECT id FROM silver.espaces_verts", con=connection)
+        sql_data = pd.read_sql("SELECT id FROM silver.trilib", con=connection)
 
         # on insère que les données qui ne sont pas déjà présentes dans la table
+
         df_merge = df.merge(
             sql_data, on="id", how="left", indicator=True, suffixes=("", "_sql")
         )
@@ -134,15 +117,15 @@ def main():
         if not df_to_insert.empty:
             print(f"Données à insérer : {len(df_to_insert)}")
             df_to_insert.to_sql(
-                "espaces_verts",
+                "trilib",
                 con=connection,
                 if_exists="append",
                 index=False,
                 schema="silver",
             )
-            print("Données insérées dans la table 'espaces_verts'")
+            print("Données insérées dans la table 'trilib'")
         else:
-            print("Aucune nouvelle donnée à insérer dans la table 'espaces_verts'")
+            print("Aucune nouvelle donnée à insérer dans la table 'trilib'")
 
 
 if __name__ == "__main__":
