@@ -19,7 +19,7 @@ services:
   mongo:
     image: mongo:8.2.7
     container_name: mongo_db
-    restart: always
+    restart: unless-stopped
     networks:
       - base_de_donnee
     environment:
@@ -34,7 +34,7 @@ services:
   mongo-express:
     image: mongo-express:1.0.2
     container_name: mongo_express
-    restart: always
+    restart: unless-stopped
     networks:
       - base_de_donnee
     ports:
@@ -57,7 +57,7 @@ services:
   dbgate:
     image: dbgate/dbgate:7.1.9
     container_name: dbgate_universal
-    restart: always
+    restart: unless-stopped
     ports:
       - 3000:3000 # Accès via http://localhost:3000
     networks:
