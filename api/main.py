@@ -18,6 +18,7 @@ import pandas as pd
 from sqlalchemy import text
 from pipeline.db import get_engine
 from api.geo import get_arrondissements_geojson, get_iris_geojson
+from api.indicateurs import get_indicateurs_iris, get_indicateurs_arrondissement
 
 app = FastAPI(
     title="Urban Data Explorer — API indicateurs",
@@ -44,3 +45,14 @@ def get_arrondissements_geo():
 def get_iris_geo():
     """Retourne le GeoJSON des zones IRIS de Paris depuis MongoDB."""
     return get_iris_geojson()
+
+
+# ─── endpoints indicateurs (données PostgreSQL gold) ─────────────────────────
+@app.get("/api/indicateurs/iris")
+def indicateurs_iris(annee: int = Query(2025)):
+    return get_indicateurs_iris(annee)
+
+
+@app.get("/api/indicateurs/arrondissement")
+def indicateurs_arrondissement(annee: int = Query(2025)):
+    return get_indicateurs_arrondissement(annee)
