@@ -27,8 +27,9 @@ AES:
   colleges: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/etablissements-scolaires-colleges/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
   ecoles_effectifs: "https://www.data.gouv.fr/api/1/datasets/r/8a0b8d35-fea2-4c8d-9af1-fb25edb16980"
   etablissements_hospitaliers: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/les_etablissements_hospitaliers_franciliens/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
-  services_sante: "https://www.data.gouv.fr/api/1/datasets/r/e405ce09-6d40-4505-835b-3f10f33632ac"
+  services_sante: "https://www.insee.fr/fr/statistiques/fichier/8217527/DS_BPE_XLSX_FR.zip"
   population_par_age: "https://www.data.gouv.fr/api/1/datasets/r/b8ad4a63-a4e3-4ef2-af6e-b08ef3b8084d"
+  population_iris: "https://www.insee.fr/fr/statistiques/fichier/8647014/base-ic-evol-struct-pop-2022_csv.zip"
 
 map:
   iris: "https://data.iledefrance.fr/api/explore/v2.1/catalog/datasets/iris/exports/geojson?lang=fr&timezone=Europe%2FBerlin"

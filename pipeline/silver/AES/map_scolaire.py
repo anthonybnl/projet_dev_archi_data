@@ -22,14 +22,22 @@ def _parse_arrondissement(val):
 
 def _load_file(path):
     df = pd.read_csv(path, sep=";", encoding="utf-8-sig")
-    # Filtrer sur la dernière année scolaire disponible
     derniere_annee = df["Année scolaire"].dropna().max()
     df = df[df["Année scolaire"] == derniere_annee]
     coords = df["geo_point_2d"].apply(_parse_coords)
     df["lat"] = coords.apply(lambda x: x[0])
     df["lon"] = coords.apply(lambda x: x[1])
     df["arrondissement"] = df["Arrondissement"].apply(_parse_arrondissement)
-    return df[["Libellé établissement", "Adresse", "Type établissement", "arrondissement", "lat", "lon"]].copy()
+    return df[
+        [
+            "Libellé établissement",
+            "Adresse",
+            "Type établissement",
+            "arrondissement",
+            "lat",
+            "lon",
+        ]
+    ].copy()
 
 
 def run(engine):
@@ -37,9 +45,11 @@ def run(engine):
     df_mat = _load_file(PATHS["maternelles"])
 
     # Déduplication des Polyvalents : supprimés de elementaires, conservés depuis maternelles
-    poly_mat = df_mat[df_mat["Type établissement"] == "Polyvalent"].set_index(
-        ["Libellé établissement", "Adresse"]
-    ).index
+    poly_mat = (
+        df_mat[df_mat["Type établissement"] == "Polyvalent"]
+        .set_index(["Libellé établissement", "Adresse"])
+        .index
+    )
     df_elem = df_elem[
         ~df_elem.set_index(["Libellé établissement", "Adresse"]).index.isin(poly_mat)
     ]
@@ -48,20 +58,34 @@ def run(engine):
     result.columns = ["nom", "adresse", "type", "arrondissement", "lat", "lon"]
     result = result.dropna(subset=["lat", "lon", "arrondissement"])
     result["arrondissement"] = result["arrondissement"].astype(int)
-
-    # Construire l'id unique : adresse + arrondissement (ex: "7 RUE DOUDEAUVILLE 18e")
-    result["id"] = result["adresse"].str.strip() + " " + result["arrondissement"].astype(str) + "e"
-
-    # Déduplication côté Python : si même id, on garde la première occurrence
+    result["id"] = (
+        result["adresse"].str.strip() + " " + result["arrondissement"].astype(str) + "e"
+    )
     result = result.drop_duplicates(subset=["id"], keep="first")
 
     # Jointure spatiale IRIS
     result = join_iris(result)
     result["created_at"] = datetime.now()
 
-    result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "code_iris", "nom_iris", "created_at"]]
+    result = result[
+        [
+            "id",
+            "nom",
+            "adresse",
+            "type",
+            "arrondissement",
+            "lat",
+            "lon",
+            "code_iris",
+            "nom_iris",
+            "created_at",
+        ]
+    ]
 
     schema = "silver"
     insert_ignore(result, "map_scolaire", engine, schema)
     print(f"[silver.map_scolaire] {len(result)} établissements traités")
-    print(f"  → Répartition : {result['type'].value_counts().to_dict()}")
+    print(
+        f"  → Répartition : {pd.Series(result['type'].values).value_counts().to_dict()}"
+    )
+    print(f"  → Sans code_iris : {result['code_iris'].isna().sum()}")

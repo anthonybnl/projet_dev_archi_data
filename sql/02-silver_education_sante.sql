@@ -68,6 +68,14 @@ CREATE TABLE IF NOT EXISTS silver.population_totale_paris (
     created_at          TIMESTAMP   NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS silver.population_iris (
+    code_iris       TEXT            PRIMARY KEY,
+    arrondissement  SMALLINT        NOT NULL,
+    pop_totale      DOUBLE PRECISION NOT NULL,
+    pop_3_10        DOUBLE PRECISION NOT NULL,
+    pop_11_17       DOUBLE PRECISION NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS silver.sante_paris (
     id                  SERIAL      PRIMARY KEY,
     arrondissement      SMALLINT    NOT NULL,
@@ -77,5 +85,3 @@ CREATE TABLE IF NOT EXISTS silver.sante_paris (
     nb_pharmacies       INTEGER     NOT NULL DEFAULT 0,
     created_at          TIMESTAMP   NOT NULL DEFAULT NOW()
 );
-
-
