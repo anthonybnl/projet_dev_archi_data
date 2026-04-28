@@ -1,8 +1,10 @@
 # Configuration des sources de données (Architecture Médaillon - Raw Layer)
 reseau:
-    haut_debit: "https://www.data.gouv.fr/api/1/datasets/r/e981ecb7-f1e7-41aa-9232-267294c53a46"
-    antennes: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/antennes-relais/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
-    couvertures_theoriques: "https://data.arcep.fr/mobile/couvertures_theoriques/last/Metropole/00_Metropole"
+  haut_debit: "https://www.data.gouv.fr/api/1/datasets/r/e981ecb7-f1e7-41aa-9232-267294c53a46"
+  antennes: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/antennes-relais/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  couvertures_theoriques: "https://data.arcep.fr/mobile/couvertures_theoriques/last/Metropole/00_Metropole"
+  qos_habitations: "https://data.arcep.fr/mobile/mesures_qualite_arcep/last/Metropole/2025_QoS_Metropole_data_habitations.csv"
+  fibre: "https://data.arcep.fr/fixe/cartes_de_deploiement/last/carte_fibre_immeubles_2025_T4_20260130.csv"
 
 environnement:
   arbres: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/les-arbres/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"

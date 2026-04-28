@@ -15,7 +15,6 @@ def get_engine():
     return create_engine(url)
 
 def append_table(df, table_name, engine, schema):
-    """Append simple — insère toutes les lignes (tables agrégées par arrondissement)."""
     df.to_sql(table_name, engine, schema=schema, if_exists="append", index=False)
 
 
@@ -30,7 +29,7 @@ def insert_if_empty(df, table_name, engine, schema):
 
 
 def insert_ignore(df, table_name, engine, schema):
-    """Insère uniquement les nouvelles lignes, ignore les conflits (tables d'établissements)."""
+    """Insère uniquement les nouvelles lignes, ignore les conflits."""
     from sqlalchemy.dialects.postgresql import insert as pg_insert
     from sqlalchemy import Table, MetaData
 
