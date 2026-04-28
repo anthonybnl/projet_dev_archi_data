@@ -26,15 +26,16 @@ app = FastAPI(
 )
 
 # on autorise le front local (Vite tourne sur :5173 par défaut)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
 
-# ─── endpoints GeoJSON (données MongoDB) ─────────────────────────────────────
+# endpoints GeoJSON depuis MongoDB
+
 @app.get("/api/geo/arrondissements")
 def get_arrondissements_geo():
     """Retourne le GeoJSON des 20 arrondissements de Paris depuis MongoDB."""
@@ -47,7 +48,8 @@ def get_iris_geo():
     return get_iris_geojson()
 
 
-# ─── endpoints indicateurs (données PostgreSQL gold) ─────────────────────────
+# endpoints indicateurs depuis PostgreSQL
+
 @app.get("/api/indicateurs/iris")
 def indicateurs_iris(annee: int = Query(2025)):
     return get_indicateurs_iris(annee)

@@ -92,6 +92,15 @@ def _fetch_reseau(engine):
     return df.rename(columns={"score_final": "score_reseau"})
 
 
+def _fetch_aes(engine):
+    query = text("""
+        SELECT arrondissement, score_education, score_sante, score_aes
+        FROM gold.indicateurs_aes_arrondissement
+    """)
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
+
+
 def _build_iris_dataframe(annee: int) -> pd.DataFrame:
     engine = get_engine()
     ref = _get_iris_referentiel()
@@ -140,5 +149,9 @@ def get_indicateurs_arrondissement(annee: int = 2025) -> list[dict]:
         result = result.merge(modes.rename(col), on="arrondissement", how="left", suffixes=("_drop", ""))
         if f"{col}_drop" in result.columns:
             result = result.drop(columns=[f"{col}_drop"])
+
+    # scores AES (dispo uniquement au niveau arrondissement)
+    aes = _fetch_aes(get_engine())
+    result = result.merge(aes, on="arrondissement", how="left")
 
     return _sanitize(result.to_dict(orient="records"))
