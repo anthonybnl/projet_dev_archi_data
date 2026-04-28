@@ -1,6 +1,7 @@
 import pandas as pd
+import geopandas as gpd
 from datetime import datetime
-from pipeline.config import PATHS
+from pipeline.config import PATHS, IRIS_PATH
 from pipeline.db import insert_ignore
 from pipeline.silver.iris_utils import join_iris
 
@@ -22,7 +23,6 @@ def _parse_arrondissement(val):
 
 def _load_file(path):
     df = pd.read_csv(path, sep=";", encoding="utf-8-sig")
-    # Filtrer sur la dernière année scolaire disponible
     derniere_annee = df["Année scolaire"].dropna().max()
     df = df[df["Année scolaire"] == derniere_annee]
     coords = df["geo_point_2d"].apply(_parse_coords)
@@ -30,6 +30,14 @@ def _load_file(path):
     df["lon"] = coords.apply(lambda x: x[1])
     df["arrondissement"] = df["Arrondissement"].apply(_parse_arrondissement)
     return df[["Libellé établissement", "Adresse", "Type établissement", "arrondissement", "lat", "lon"]].copy()
+
+
+def _load_iris():
+    gdf = gpd.read_file(IRIS_PATH)
+    gdf = gdf[gdf["insee_com"].astype(str).str.startswith("751")][["code_iris", "geometry"]]
+    if gdf.crs and gdf.crs.to_epsg() != 4326:
+        gdf = gdf.to_crs(epsg=4326)
+    return gdf
 
 
 def run(engine):
@@ -48,20 +56,18 @@ def run(engine):
     result.columns = ["nom", "adresse", "type", "arrondissement", "lat", "lon"]
     result = result.dropna(subset=["lat", "lon", "arrondissement"])
     result["arrondissement"] = result["arrondissement"].astype(int)
-
-    # Construire l'id unique : adresse + arrondissement (ex: "7 RUE DOUDEAUVILLE 18e")
     result["id"] = result["adresse"].str.strip() + " " + result["arrondissement"].astype(str) + "e"
-
-    # Déduplication côté Python : si même id, on garde la première occurrence
     result = result.drop_duplicates(subset=["id"], keep="first")
 
     # Jointure spatiale IRIS
     result = join_iris(result)
     result["created_at"] = datetime.now()
+    result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "code_iris", "created_at"]]
 
     result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "code_iris", "nom_iris", "created_at"]]
 
     schema = "silver"
     insert_ignore(result, "map_scolaire", engine, schema)
     print(f"[silver.map_scolaire] {len(result)} établissements traités")
-    print(f"  → Répartition : {result['type'].value_counts().to_dict()}")
+    print(f"  → Répartition : {pd.Series(result['type'].values).value_counts().to_dict()}")
+    print(f"  → Sans code_iris : {result['code_iris'].isna().sum()}")

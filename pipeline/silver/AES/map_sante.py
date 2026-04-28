@@ -1,45 +1,35 @@
 import pandas as pd
+import geopandas as gpd
 from datetime import datetime
-from pipeline.config import PATHS
+from pipeline.config import PATHS, IRIS_PATH
 from pipeline.db import insert_ignore
 from pipeline.silver.iris_utils import join_iris
+
+
+def _load_iris():
+    gdf = gpd.read_file(IRIS_PATH)
+    gdf = gdf[gdf["insee_com"].astype(str).str.startswith("751")][["code_iris", "geometry"]]
+    if gdf.crs and gdf.crs.to_epsg() != 4326:
+        gdf = gdf.to_crs(epsg=4326)
+    return gdf
 
 
 def run(engine):
     df = pd.read_csv(PATHS["hopitaux"], sep=";", encoding="utf-8-sig")
 
-    # Filtrer sur Paris (code postal 75xxx)
     df = df[df["CP_VILLE"].astype(str).str.startswith("75")].copy()
-
-    # Extraire l'arrondissement depuis le code postal (ex: 75011 → 11)
     df["arrondissement"] = df["CP_VILLE"].astype(str).str[:5].astype(int) - 75000
 
     result = df[[
-        "FINESS_ET",
-        "RAISON_SOCIALE",
-        "ADRESSE_COMPLETE",
-        "NUM_TEL",
-        "CATEGORIE_DE_L_ETABLISSEMENT",
-        "TYPE_ETABLISSEMENT",
-        "CP_VILLE",
-        "arrondissement",
-        "lat",
-        "lng",
+        "FINESS_ET", "RAISON_SOCIALE", "ADRESSE_COMPLETE", "NUM_TEL",
+        "CATEGORIE_DE_L_ETABLISSEMENT", "TYPE_ETABLISSEMENT", "CP_VILLE",
+        "arrondissement", "lat", "lng",
     ]].copy()
-
     result.columns = [
-        "finess",
-        "nom",
-        "adresse",
-        "telephone",
-        "categorie",
-        "type_etablissement",
-        "cp_ville",
-        "arrondissement",
-        "lat",
-        "lon",
+        "finess", "nom", "adresse", "telephone",
+        "categorie", "type_etablissement", "cp_ville",
+        "arrondissement", "lat", "lon",
     ]
-
     result = result.dropna(subset=["lat", "lon"])
     result["arrondissement"] = result["arrondissement"].astype(int)
 
@@ -52,4 +42,5 @@ def run(engine):
 
     insert_ignore(result, "map_sante", engine, schema)
     print(f"[silver.map_sante] {len(result)} établissements traités")
-    print(f"  → Top catégories : {result['categorie'].value_counts().head(5).to_dict()}")
+    print(f"  → Top catégories : {pd.Series(result['categorie'].values).value_counts().head(5).to_dict()}")
+    print(f"  → Sans code_iris : {result['code_iris'].isna().sum()}")

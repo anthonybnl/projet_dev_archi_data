@@ -24,6 +24,7 @@ PATHS = {
     "hopitaux": str(
         RAW_DIR / "AES" / "les_etablissements_hospitaliers_franciliens.csv"
     ),
+    "population_iris": str(RAW_DIR / "AES" / "base-ic-evol-struct-pop-2022.CSV"),
     # Réseau mobile
     "antennes": str(RAW_DIR / "reseau" / "antennes-relais.csv"),
     "couverture_dir": str(RAW_DIR / "reseau" / "couverture_theorique"),
