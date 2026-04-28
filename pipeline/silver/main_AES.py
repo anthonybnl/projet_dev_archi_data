@@ -1,10 +1,21 @@
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+base_path = str(Path(__file__).resolve().parents[2])
+if not base_path in sys.path:
+    sys.path.insert(0, base_path)
 
 from pipeline.db import get_engine
-from pipeline.silver.AES import ecoles, colleges, population, sante, map_scolaire, map_sante
+from pipeline.silver.AES import (
+    ecoles,
+    colleges,
+    population,
+    sante,
+    map_scolaire,
+    map_sante,
+)
+
+
 def run_silver(engine):
     print("\n=== SILVER ===")
     ecoles.run(engine)

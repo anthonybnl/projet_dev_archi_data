@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 from pipeline.config import PATHS
 from pipeline.db import insert_ignore
+from pipeline.silver.iris_utils import join_iris
 
 
 def run(engine):
@@ -41,9 +42,14 @@ def run(engine):
 
     result = result.dropna(subset=["lat", "lon"])
     result["arrondissement"] = result["arrondissement"].astype(int)
+
+    # Jointure spatiale IRIS
+    result = join_iris(result)
     result["created_at"] = datetime.now()
 
     schema = "silver"
+    result = result[["finess", "nom", "adresse", "telephone", "categorie", "type_etablissement", "cp_ville", "arrondissement", "lat", "lon", "code_iris", "nom_iris", "created_at"]]
+
     insert_ignore(result, "map_sante", engine, schema)
     print(f"[silver.map_sante] {len(result)} établissements traités")
     print(f"  → Top catégories : {result['categorie'].value_counts().head(5).to_dict()}")

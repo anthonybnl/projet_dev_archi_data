@@ -14,8 +14,8 @@ environnement:
 
 mobilite:
   velib: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/velib-emplacement-des-stations/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
-  metro: "https://www.data.gouv.fr/api/1/datasets/r/5b645234-e6fd-4de8-889c-574a80531aca"
-  bus: "https://data.iledefrance-mobilites.fr/api/explore/v2.1/catalog/datasets/arrets-lignes/exports/csv?refine=nom_commune%3AParis"
+  arrets: "https://data.iledefrance-mobilites.fr/api/explore/v2.1/catalog/datasets/arrets/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"
+  gares-et-stations: "https://www.data.gouv.fr/api/1/datasets/r/34c7e096-f984-4b74-8d3c-a379a6762f42"
 
 obligatoire:
   logement_sociaux: "https://opendata.paris.fr/api/explore/v2.1/catalog/datasets/logements-sociaux-finances-a-paris/exports/csv?lang=fr&timezone=Europe%2FBerlin&use_labels=true&delimiter=%3B"

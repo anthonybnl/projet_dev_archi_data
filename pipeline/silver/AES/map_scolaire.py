@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import datetime
 from pipeline.config import PATHS
 from pipeline.db import insert_ignore
+from pipeline.silver.iris_utils import join_iris
 
 
 def _parse_coords(geo_point):
@@ -53,10 +54,12 @@ def run(engine):
 
     # Déduplication côté Python : si même id, on garde la première occurrence
     result = result.drop_duplicates(subset=["id"], keep="first")
+
+    # Jointure spatiale IRIS
+    result = join_iris(result)
     result["created_at"] = datetime.now()
 
-    # Réordonner les colonnes avec id en premier
-    result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "created_at"]]
+    result = result[["id", "nom", "adresse", "type", "arrondissement", "lat", "lon", "code_iris", "nom_iris", "created_at"]]
 
     schema = "silver"
     insert_ignore(result, "map_scolaire", engine, schema)
