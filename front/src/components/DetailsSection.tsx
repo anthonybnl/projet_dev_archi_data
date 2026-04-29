@@ -89,7 +89,7 @@ export function DetailsSection({
           </span>
         </div>
       ))}
-      {/* <button onClick={() => onPin(zone)} style={{
+      <button onClick={() => onPin(zone)} style={{
         width: '100%', padding: '7px 12px', borderRadius: '8px', cursor: 'pointer',
         border: `1.5px solid ${isPinned ? C.accent : C.borderMid}`,
         background: isPinned ? C.accentLight : 'transparent',
@@ -100,7 +100,7 @@ export function DetailsSection({
       }}>
         <Icon.Pin />
         {isPinned ? 'Épinglé pour comparaison' : 'Épingler pour comparaison'}
-      </button> */}
+      </button>
     </Section>
   );
 }

@@ -66,9 +66,10 @@ export default function App() {
 
   const handlePin = (z: ZoneData) => {
     setPinned(p => {
-      if (p.some(x => x.code === z.code)) return p;
-      // on garde max 2 zones, on remplace la plus ancienne si déjà 2
-      return p.length >= 2 ? [p[1], z] : [...p, z];
+      // on ne compare que des zones du même niveau (iris vs iris, arr vs arr)
+      const sameLevel = p.filter(x => x.level === z.level);
+      if (sameLevel.some(x => x.code === z.code)) return sameLevel;
+      return sameLevel.length >= 2 ? [sameLevel[1], z] : [...sameLevel, z];
     });
   };
 
@@ -101,7 +102,7 @@ export default function App() {
         />
 
         <aside style={{
-          width: '358px', flexShrink: 0, background: C.panel,
+          width: '360px', flexShrink: 0, background: C.panel,
           borderLeft: `1px solid ${C.border}`,
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
@@ -116,7 +117,7 @@ export default function App() {
             />
             <TimelineSection year={year} onChange={setYear} />
             <DetailsSection zone={selectedZone} onPin={handlePin} pinned={pinned} />
-            {/* <CompareSection pinned={pinned} onUnpin={handleUnpin} /> */}
+            <CompareSection pinned={pinned} onUnpin={handleUnpin} />
           </div>
 
           {/* <div style={{

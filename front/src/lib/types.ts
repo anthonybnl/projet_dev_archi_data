@@ -20,6 +20,7 @@ export interface Indicator {
 
 // données renvoyées par l'API pour une zone (arrondissement ou IRIS) sur une année
 export interface ZoneData {
+  level: 'arrondissement' | 'iris';
   code: string;
   nom: string;
   arrondissement: number;

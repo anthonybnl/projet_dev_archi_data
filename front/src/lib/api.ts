@@ -28,6 +28,7 @@ export async function getIndicateursArrondissement(annee: number): Promise<ZoneD
     const num_arr_str = `${d.arrondissement}${d.arrondissement === 1 ? 'er' : 'e'} arrondissement`
     return {
       ...d,
+      level: 'arrondissement',
       code: String(d.arrondissement),
       nom: `${code_insee} - ${num_arr_str}`,
       score_education: d.score_education ?? null,
@@ -42,6 +43,7 @@ export async function getIndicateursIris(annee: number): Promise<ZoneData[]> {
   const raw = await fetchJson<any[]>(`/api/indicateurs/iris?annee=${annee}`);
   return raw.map(d => ({
     ...d,
+    level: 'iris',
     code: d.code_iris,
     nom: `${d.code_iris} - ${d.nom_iris}`,
     score_education: d.score_education ?? null,

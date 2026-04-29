@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { C } from '../lib/theme';
 import { Icon } from './Icons';
 import { Section } from './Section';
-import { INDICATORS } from '../lib/indicators';
+import { INDICATORS, fmtVal } from '../lib/indicators';
 import type { ZoneData } from '../lib/types';
 
 // permet d'épingler 2 zones et d'afficher leurs valeurs côte à côte
@@ -102,11 +102,7 @@ export function CompareSection({
                     color: i === betterIdx ? C.accent : C.textMid,
                     textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontSize: '11.5px',
                   }}>
-                    {v === null
-                      ? '—'
-                      : ind.id === 'iai'
-                        ? v.toFixed(1)
-                        : Math.round(v).toLocaleString('fr-FR')}
+                    {fmtVal(v, ind.id)}
                   </span>
                 ))}
               </div>
