@@ -2,7 +2,7 @@ import math
 import pandas as pd
 from sqlalchemy import text
 from pipeline.db import get_engine
-from api.geo import _get_db
+from api.nosql_db import _get_db
 
 
 def _sanitize(records: list[dict]) -> list[dict]:
@@ -92,6 +92,15 @@ def _fetch_reseau(engine):
     return df.rename(columns={"score_final": "score_reseau"})
 
 
+def _fetch_mobilite(engine):
+    query = text("""
+        SELECT code_iris, score_transport_collectif, score_velib, score_mobilite
+        FROM gold.indicateurs_mobilite_iris
+    """)
+    with engine.connect() as conn:
+        return pd.read_sql(query, conn)
+
+
 def _fetch_aes(engine):
     query = text("""
         SELECT arrondissement, score_education, score_sante, score_aes
@@ -109,12 +118,14 @@ def _build_iris_dataframe(annee: int) -> pd.DataFrame:
     socio = _fetch_socio_eco(engine, annee)
     enviro = _fetch_environnement(engine)
     reseau = _fetch_reseau(engine)
+    mobilite = _fetch_mobilite(engine)
 
     # left join tout sur le référentiel
     df = ref.merge(logements, on="code_iris", how="left")
     df = df.merge(socio, on="code_iris", how="left")
     df = df.merge(enviro, on="code_iris", how="left")
     df = df.merge(reseau, on="code_iris", how="left")
+    df = df.merge(mobilite, on="code_iris", how="left")
 
     df["nb_logements_sociaux_finances"] = df["nb_logements_sociaux_finances"].fillna(0).astype(int)
 
@@ -137,7 +148,8 @@ def get_indicateurs_arrondissement(annee: int = 2025) -> list[dict]:
 
     # agrégation : sum pour logements, mean pour les autres, mode pour les opérateurs
     agg_dict = {"nb_logements_sociaux_finances": "sum"}
-    for col in ["revenu_median", "prix_m2_median", "iai", "score_environnemental", "score_reseau"]:
+    for col in ["revenu_median", "prix_m2_median", "iai", "score_environnemental", "score_reseau",
+                 "score_transport_collectif", "score_velib", "score_mobilite"]:
         agg_dict[col] = "mean"
 
     grouped = df.groupby("arrondissement")

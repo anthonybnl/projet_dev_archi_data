@@ -1,6 +1,6 @@
 -- Une ligne par code_iris — table de sortie finale du pipeline réseau.
 -- Agrège les trois sous-scores silver en un score réseau unique exposé au front.
-DROP TABLE IF EXISTS gold.score_reseau;
+
 CREATE TABLE gold.score_reseau (
     id                        SERIAL       PRIMARY KEY,
     code_iris                 VARCHAR(9)   NOT NULL UNIQUE,

@@ -1,5 +1,5 @@
 """
-Lance avec : uvicorn api.main:app --reload-dir api --reload --port 8000
+Lancement : uvicorn api.main:app --reload-dir api --reload --port 8000
 """
 
 import json
