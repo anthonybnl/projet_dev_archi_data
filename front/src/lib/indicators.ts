@@ -5,8 +5,14 @@ import type { Indicator } from './types';
 export const INDICATORS: Indicator[] = [
   { id: 'price',  label: 'Prix au m² (DVF)',                    short: 'Prix m²',     unit: '€/m²',      color: '#2d6a4f' },
   { id: 'social', label: 'Logements sociaux financés',          short: 'Log. sociaux', unit: 'logements', color: '#52b788' },
-  { id: 'income', label: 'Revenu médian (Filosofi)',            short: 'Rev. médian', unit: '€/an',      color: '#40916c' },
-  { id: 'iai',    label: "Indice d'Accessibilité Immobilière",  short: 'IAI',         unit: 'mois/m²',   color: '#74c69d' },
+  { id: 'income', label: 'Revenu médian (Filosofi)',            short: 'Rev. médian', unit: '€/an',      color: '#40916c' },  
+  { id: 'iai',    label: "Indice d'Accessibilité Immobilière",  short: 'IAI',         unit: 'mois/m²',   color: '#74c69d' },  
+
+  { id: 'environnement',    label: "Indice environnemental",  short: 'ENV',         unit: '%',   color: '#74c69d' },  
+  { id: 'mobilite',    label: "Indice de mobilité",  short: 'MOB',         unit: '%',   color: '#74c69d' },  
+  { id: 'AES',    label: "Indice d'accessibilité éducation et soin",  short: 'AES',         unit: '%',   color: '#74c69d' },  
+  { id: 'reseau',    label: "Indice technologique",  short: 'TEC',         unit: '%',   color: '#74c69d' },
+
 ];
 
 export const YEARS = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];

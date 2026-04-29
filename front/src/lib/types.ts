@@ -1,6 +1,6 @@
 // les 4 indicateurs gérés par le front
 // les ids matchent ceux exposés par l'API
-export type IndicatorId = 'price' | 'social' | 'income' | 'iai';
+export type IndicatorId = 'price' | 'social' | 'income' | 'iai' | 'environnement' | 'mobilite' | 'AES' | 'reseau';
 
 export interface Indicator {
   id: IndicatorId;

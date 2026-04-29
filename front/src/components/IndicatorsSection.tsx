@@ -27,11 +27,11 @@ export function IndicatorsSection({
             <div key={ind.id} onClick={() => onPrimary(ind.id)} style={{
               display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 10px',
               borderRadius: '8px',
-              border: `1px solid ${isPrimary ? ind.color + '66' : C.border}`,
+              border: `1px solid ${isPrimary ? C.accent + '66' : C.border}`,
               background: isPrimary ? C.accentXLight : C.bg, cursor: 'pointer',
               transition: 'all 0.15s',
             }}>
-              <div onClick={e => { e.stopPropagation(); onToggle(ind.id); }} style={{
+              {/* <div onClick={e => { e.stopPropagation(); onToggle(ind.id); }} style={{
                 width: '15px', height: '15px', borderRadius: '4px', flexShrink: 0, cursor: 'pointer',
                 background: isActive ? ind.color : 'transparent',
                 border: `1.5px solid ${isActive ? ind.color : C.borderMid}`,
@@ -43,7 +43,7 @@ export function IndicatorsSection({
                       strokeLinecap="round" strokeLinejoin="round" fill="none" />
                   </svg>
                 )}
-              </div>
+              </div> */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '12px', fontWeight: isPrimary ? 600 : 400, color: C.text, lineHeight: 1.3 }}>
                   {ind.label}
@@ -54,7 +54,7 @@ export function IndicatorsSection({
                   </div>
                 )}
               </div>
-              <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: ind.color, flexShrink: 0 }} />
+              {/* <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: ind.color, flexShrink: 0 }} /> */}
             </div>
           );
         })}

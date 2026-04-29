@@ -19,7 +19,10 @@ import type { IndicatorId, ZoneData, Granularity } from './lib/types';
 
 export default function App() {
   const [indicator, setIndicator] = useState<IndicatorId>('price');
+
+  // inutilisé pour le moment
   const [activeInds, setActiveInds] = useState<IndicatorId[]>(['price', 'social', 'income', 'iai']);
+
   const [year, setYear] = useState(2025);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [pinned, setPinned] = useState<ZoneData[]>([]);
