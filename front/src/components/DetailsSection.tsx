@@ -38,10 +38,13 @@ export function DetailsSection({
   }
 
   const isPinned = pinned.some(p => p.code === zone.code);
+  const displayName = zone.code.length <= 2
+    ? `${zone.arrondissement}${zone.arrondissement === 1 ? 'er' : 'e'} arrondissement`
+    : `IRIS ${zone.code}`;
   const rows: { label: string; value: string }[] = [
-    { label: 'Prix m² médian',          value: fmtVal(zone.price, 'price') },
-    { label: 'Logements sociaux fin.',  value: fmtVal(zone.social, 'social') },
-    { label: 'Revenu médian',            value: fmtVal(zone.income, 'income') },
+    { label: 'Prix m² médian',          value: fmtVal(zone.prix_m2_median, 'prix_m2_median') },
+    { label: 'Logements sociaux fin.',  value: fmtVal(zone.nb_logements_sociaux_finances, 'nb_logements_sociaux_finances') },
+    { label: 'Revenu médian',            value: fmtVal(zone.revenu_median, 'revenu_median') },
   ];
 
   return (
@@ -50,7 +53,7 @@ export function DetailsSection({
         background: C.accentXLight, borderRadius: '9px', padding: '10px 12px', marginBottom: '10px',
         border: `1px solid ${C.accentLight}`,
       }}>
-        <div style={{ fontWeight: 700, fontSize: '14px', color: C.text }}>{zone.name}</div>
+        <div style={{ fontWeight: 700, fontSize: '14px', color: C.text }}>{displayName}</div>
         <div style={{ fontSize: '11px', color: C.textMid, marginTop: '2px', fontFamily: 'monospace' }}>
           {zone.code.length === 9 ? `IRIS ${zone.code}` : `Arr. ${zone.code}`}
         </div>

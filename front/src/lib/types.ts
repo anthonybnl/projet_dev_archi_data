@@ -1,6 +1,14 @@
-// les 4 indicateurs gérés par le front
-// les ids matchent ceux exposés par l'API
-export type IndicatorId = 'price' | 'social' | 'income' | 'iai' | 'environnement' | 'mobilite' | 'AES' | 'reseau';
+// les indicateurs sélectionnables sur la carte
+// les ids matchent les champs de ZoneData (utilisés en z[indicator])
+export type IndicatorId =
+  | 'prix_m2_median'
+  | 'nb_logements_sociaux_finances'
+  | 'revenu_median'
+  | 'iai'
+  | 'score_environnemental'
+  | 'score_mobilite'
+  | 'score_aes'
+  | 'score_reseau';
 
 export interface Indicator {
   id: IndicatorId;
@@ -10,20 +18,32 @@ export interface Indicator {
   color: string;
 }
 
-// données indicateurs renvoyées par l'API pour une zone (arrondissement ou IRIS) sur une année
+// données renvoyées par l'API pour une zone (arrondissement ou IRIS) sur une année
 export interface ZoneData {
-  // identifiant : code_arinsee (75101) pour les arrondissements, code_iris (751010101) pour IRIS
   code: string;
-  // nom lisible
-  name: string;
-  // arrondissement parent (1 à 20)
   arrondissement: number;
-  // valeurs des indicateurs — null si pas dispo pour l'année demandée
-  price: number | null;
-  social: number | null;
-  income: number | null;
+
+  // socio-éco
+  nb_logements_sociaux_finances: number | null;
+  revenu_median: number | null;
+  prix_m2_median: number | null;
   iai: number | null;
+
+  // scores thématiques
+  score_environnemental: number | null;
+  score_reseau: number | null;
+  score_transport_collectif: number | null;
+  score_velib: number | null;
+  score_mobilite: number | null;
+
+  // réseau
+  meilleur_operateur_mobile: string | null;
+  meilleur_operateur_fibre: string | null;
+
+  // AES (dispo uniquement arrondissement, null pour IRIS)
+  score_education: number | null;
+  score_sante: number | null;
+  score_aes: number | null;
 }
 
-// niveau de granularité actuellement affiché sur la carte
 export type Granularity = 'arrondissement' | 'iris';

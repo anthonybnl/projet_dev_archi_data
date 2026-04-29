@@ -32,7 +32,9 @@ export function CompareSection({
               padding: '7px 10px', borderRadius: '8px', background: C.accentXLight,
               border: `1px solid ${C.accentLight}`,
             }}>
-              <span style={{ fontSize: '12.5px', fontWeight: 600, color: C.text }}>{z.name}</span>
+              <span style={{ fontSize: '12.5px', fontWeight: 600, color: C.text }}>
+                {z.code.length <= 2 ? `${z.arrondissement}${z.arrondissement === 1 ? 'er' : 'e'} arr.` : `IRIS ${z.code}`}
+              </span>
               <button onClick={() => onUnpin(z.code)} style={{
                 background: 'none', border: 'none', cursor: 'pointer', color: C.textLight,
                 padding: '2px', display: 'flex', borderRadius: '4px',
@@ -81,7 +83,7 @@ export function CompareSection({
             const vals = pinned.slice(0, 2).map(z => z[ind.id]);
             // pour le prix et l'iai (mois/m²) : valeur basse = mieux
             // pour social et revenu : valeur haute = mieux
-            const lowerIsBetter = ind.id === 'price' || ind.id === 'iai';
+            const lowerIsBetter = ind.id === 'prix_m2_median' || ind.id === 'iai';
             let betterIdx = -1;
             if (vals[0] !== null && vals[1] !== null) {
               betterIdx = lowerIsBetter

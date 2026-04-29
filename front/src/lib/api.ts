@@ -21,9 +21,25 @@ export const getIrisGeojson = () =>
   fetchJson<FeatureCollection>('/api/geo/iris');
 
 // indicateurs agrégés au niveau arrondissement
-export const getIndicateursArrondissement = (annee: number) =>
-  fetchJson<ZoneData[]>(`/api/indicateurs/arrondissement?annee=${annee}`);
+export async function getIndicateursArrondissement(annee: number): Promise<ZoneData[]> {
+  const raw = await fetchJson<any[]>(`/api/indicateurs/arrondissement?annee=${annee}`);
+  return raw.map(d => ({
+    ...d,
+    code: String(d.arrondissement),
+    score_education: d.score_education ?? null,
+    score_sante: d.score_sante ?? null,
+    score_aes: d.score_aes ?? null,
+  }));
+}
 
 // indicateurs au niveau IRIS (granularité fine, utilisée au zoom)
-export const getIndicateursIris = (annee: number) =>
-  fetchJson<ZoneData[]>(`/api/indicateurs/iris?annee=${annee}`);
+export async function getIndicateursIris(annee: number): Promise<ZoneData[]> {
+  const raw = await fetchJson<any[]>(`/api/indicateurs/iris?annee=${annee}`);
+  return raw.map(d => ({
+    ...d,
+    code: d.code_iris,
+    score_education: d.score_education ?? null,
+    score_sante: d.score_sante ?? null,
+    score_aes: d.score_aes ?? null,
+  }));
+}

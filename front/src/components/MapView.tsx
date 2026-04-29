@@ -82,7 +82,7 @@ function colorFeatures(
         properties: {
           ...f.properties,
           _code: code,
-          _name: z?.name ?? f.properties?.l_aroff ?? f.properties?.nom_iris ?? code,
+          _name: f.properties?.l_aroff ?? f.properties?.nom_iris ?? code,
           _color: t !== null ? rampColor(t) : '#cccccc',
           _value: v,
           _hasValue: t !== null,
@@ -179,7 +179,7 @@ export function MapView({
       const arrFc = colorFeatures(
         arrondissementsGeo,
         new Map(zonesArrondissement.map(z => [z.code, z])),
-        'c_arinsee',
+        'c_ar',
         indicator,
       );
 

@@ -18,10 +18,10 @@ import type { FeatureCollection } from 'geojson';
 import type { IndicatorId, ZoneData, Granularity } from './lib/types';
 
 export default function App() {
-  const [indicator, setIndicator] = useState<IndicatorId>('price');
+  const [indicator, setIndicator] = useState<IndicatorId>('prix_m2_median');
 
   // inutilisé pour le moment
-  const [activeInds, setActiveInds] = useState<IndicatorId[]>(['price', 'social', 'income', 'iai']);
+  const [activeInds, setActiveInds] = useState<IndicatorId[]>(['prix_m2_median', 'nb_logements_sociaux_finances', 'revenu_median', 'iai']);
 
   const [year, setYear] = useState(2025);
   const [selectedCode, setSelectedCode] = useState<string | null>(null);

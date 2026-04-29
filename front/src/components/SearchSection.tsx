@@ -17,7 +17,6 @@ export function SearchSection({
 
   const results = q.length > 1
     ? zones.filter(z =>
-        z.name.toLowerCase().includes(q.toLowerCase()) ||
         z.code.includes(q) ||
         String(z.arrondissement).startsWith(q)
       ).slice(0, 6)
@@ -58,8 +57,10 @@ export function SearchSection({
               onMouseEnter={e => (e.currentTarget.style.background = C.accentXLight)}
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <span style={{ fontWeight: 500 }}>{z.name}</span>
-              <span style={{ color: C.textLight, marginLeft: '8px', fontSize: '11.5px' }}>{z.code}</span>
+              <span style={{ fontWeight: 500 }}>
+                {z.code.length <= 2 ? `${z.arrondissement}${z.arrondissement === 1 ? 'er' : 'e'} arrondissement` : `IRIS ${z.code}`}
+              </span>
+              <span style={{ color: C.textLight, marginLeft: '8px', fontSize: '11.5px' }}>Arr. {z.arrondissement}</span>
             </button>
           ))}
         </div>
