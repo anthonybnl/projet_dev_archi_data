@@ -106,10 +106,10 @@ export default function App() {
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            {/* <SearchSection
+            <SearchSection
               zones={zonesCourantes}
               onSelect={z => setSelectedCode(z.code)}
-            /> */}
+            />
             <IndicatorsSection
               active={activeInds} onToggle={handleToggle}
               primary={indicator} onPrimary={setIndicator}

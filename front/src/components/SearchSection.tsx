@@ -15,11 +15,11 @@ export function SearchSection({
 }) {
   const [q, setQ] = useState('');
 
-  const results = q.length > 1
+  // gestion des accents (ex: 6è dans la query ne match pas 6e dans les données)
+  const results = q.length >= 2
     ? zones.filter(z =>
-        z.code.includes(q) ||
-        String(z.arrondissement).startsWith(q)
-      ).slice(0, 6)
+      z.nom.includes(q.replace('è', 'e').replace('é', 'e'))
+    ).slice(0, 6)
     : [];
 
   return (
@@ -58,7 +58,7 @@ export function SearchSection({
               onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
               <span style={{ fontWeight: 500 }}>
-                {z.code.length <= 2 ? `${z.arrondissement}${z.arrondissement === 1 ? 'er' : 'e'} arrondissement` : `IRIS ${z.code}`}
+                {z.nom}
               </span>
               <span style={{ color: C.textLight, marginLeft: '8px', fontSize: '11.5px' }}>Arr. {z.arrondissement}</span>
             </button>

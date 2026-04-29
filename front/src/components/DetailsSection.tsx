@@ -38,13 +38,22 @@ export function DetailsSection({
   }
 
   const isPinned = pinned.some(p => p.code === zone.code);
-  const displayName = zone.code.length <= 2
-    ? `${zone.arrondissement}${zone.arrondissement === 1 ? 'er' : 'e'} arrondissement`
-    : `IRIS ${zone.code}`;
+  const displayName = zone.nom
   const rows: { label: string; value: string }[] = [
-    { label: 'Prix m² médian',          value: fmtVal(zone.prix_m2_median, 'prix_m2_median') },
-    { label: 'Logements sociaux fin.',  value: fmtVal(zone.nb_logements_sociaux_finances, 'nb_logements_sociaux_finances') },
-    { label: 'Revenu médian',            value: fmtVal(zone.revenu_median, 'revenu_median') },
+    { label: 'Prix m² médian', value: fmtVal(zone.prix_m2_median, 'prix_m2_median') },
+    { label: 'Logements sociaux fin.', value: fmtVal(zone.nb_logements_sociaux_finances, 'nb_logements_sociaux_finances') },
+    { label: 'Revenu médian', value: fmtVal(zone.revenu_median, 'revenu_median') },
+  ];
+
+  const rowsIndicateursCustom: { label: string; value: string }[] = [
+    { label: 'Indice environnemental', value: fmtVal(zone.score_environnemental, 'score_environnemental') },
+    { label: 'Indice de mobilité', value: fmtVal(zone.score_mobilite, 'score_mobilite') },
+    { label: 'Indice technologique', value: fmtVal(zone.score_reseau, 'score_reseau') },
+    { label: 'Meilleur opérateur mobile', value: zone.meilleur_operateur_mobile || '—' },
+    { label: 'Meilleur opérateur fibre', value: zone.meilleur_operateur_fibre || '—' },
+    { label: "Indice d'accessibilité éducation et soin", value: fmtVal(zone.score_aes, 'score_aes') },
+    { label: 'Score éducation', value: fmtVal(zone.score_education, 'score_education') },
+    { label: 'Score santé', value: fmtVal(zone.score_sante, 'score_sante') },
   ];
 
   return (
@@ -54,9 +63,6 @@ export function DetailsSection({
         border: `1px solid ${C.accentLight}`,
       }}>
         <div style={{ fontWeight: 700, fontSize: '14px', color: C.text }}>{displayName}</div>
-        <div style={{ fontSize: '11px', color: C.textMid, marginTop: '2px', fontFamily: 'monospace' }}>
-          {zone.code.length === 9 ? `IRIS ${zone.code}` : `Arr. ${zone.code}`}
-        </div>
       </div>
       {rows.map((row, i) => (
         <div key={i} style={{
@@ -72,7 +78,18 @@ export function DetailsSection({
       <div style={{ paddingTop: '10px', marginBottom: '12px' }}>
         <IAIGauge value={zone.iai} />
       </div>
-      <button onClick={() => onPin(zone)} style={{
+      {rowsIndicateursCustom.map((row, i) => (
+        <div key={i} style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '7px 0', borderBottom: `1px solid ${C.border}`,
+        }}>
+          <span style={{ fontSize: '11.5px', color: C.textMid }}>{row.label}</span>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: C.text, fontVariantNumeric: 'tabular-nums' }}>
+            {row.value}
+          </span>
+        </div>
+      ))}
+      {/* <button onClick={() => onPin(zone)} style={{
         width: '100%', padding: '7px 12px', borderRadius: '8px', cursor: 'pointer',
         border: `1.5px solid ${isPinned ? C.accent : C.borderMid}`,
         background: isPinned ? C.accentLight : 'transparent',
@@ -83,7 +100,7 @@ export function DetailsSection({
       }}>
         <Icon.Pin />
         {isPinned ? 'Épinglé pour comparaison' : 'Épingler pour comparaison'}
-      </button>
+      </button> */}
     </Section>
   );
 }

@@ -33,7 +33,7 @@ export function CompareSection({
               border: `1px solid ${C.accentLight}`,
             }}>
               <span style={{ fontSize: '12.5px', fontWeight: 600, color: C.text }}>
-                {z.code.length <= 2 ? `${z.arrondissement}${z.arrondissement === 1 ? 'er' : 'e'} arr.` : `IRIS ${z.code}`}
+                {z.nom}
               </span>
               <button onClick={() => onUnpin(z.code)} style={{
                 background: 'none', border: 'none', cursor: 'pointer', color: C.textLight,
@@ -105,8 +105,8 @@ export function CompareSection({
                     {v === null
                       ? '—'
                       : ind.id === 'iai'
-                      ? v.toFixed(1)
-                      : Math.round(v).toLocaleString('fr-FR')}
+                        ? v.toFixed(1)
+                        : Math.round(v).toLocaleString('fr-FR')}
                   </span>
                 ))}
               </div>

@@ -17,15 +17,20 @@ def _sanitize(records: list[dict]) -> list[dict]:
 def _get_iris_referentiel():
     """Récupère la liste complète des IRIS Paris depuis MongoDB."""
     db = _get_db()
-    docs = db["iris"].find({}, {"_id": 1, "properties.insee_com": 1})
+    docs = db["iris"].find(
+        {}, {"_id": 1, "properties.insee_com": 1, "properties.nom_iris": 1}
+    )
 
     rows = []
     for doc in docs:
         code_iris = str(doc["_id"])
         insee_com = doc.get("properties", {}).get("insee_com", "")
+        nom_iris = doc.get("properties", {}).get("nom_iris", "")
         # arrondissement = 2 derniers chiffres du code commune (75101 -> 1)
         arr = int(str(insee_com)[-2:]) if insee_com else None
-        rows.append({"code_iris": code_iris, "arrondissement": arr})
+        rows.append(
+            {"code_iris": code_iris, "arrondissement": arr, "nom_iris": nom_iris}
+        )
 
     return pd.DataFrame(rows)
 
@@ -48,15 +53,19 @@ def _resolve_annee(engine, table, schema, annee_cible):
 
 
 def _fetch_logements(engine, annee):
-    annee_eff = _resolve_annee(engine, "indicateurs_logements_sociaux_iris", "gold", annee)
+    annee_eff = _resolve_annee(
+        engine, "indicateurs_logements_sociaux_iris", "gold", annee
+    )
     if annee_eff is None:
         return pd.DataFrame(columns=["code_iris", "nb_logements_sociaux_finances"])
 
-    query = text("""
+    query = text(
+        """
         SELECT code_iris, nb_logements_sociaux_finances
         FROM gold.indicateurs_logements_sociaux_iris
         WHERE annee = :annee
-    """)
+    """
+    )
     with engine.connect() as conn:
         return pd.read_sql(query, conn, params={"annee": annee_eff})
 
@@ -64,13 +73,17 @@ def _fetch_logements(engine, annee):
 def _fetch_socio_eco(engine, annee):
     annee_eff = _resolve_annee(engine, "indicateurs_socio_eco_iris", "gold", annee)
     if annee_eff is None:
-        return pd.DataFrame(columns=["code_iris", "revenu_median", "prix_m2_median", "iai"])
+        return pd.DataFrame(
+            columns=["code_iris", "revenu_median", "prix_m2_median", "iai"]
+        )
 
-    query = text("""
+    query = text(
+        """
         SELECT code_iris, revenu_median, prix_m2_median, iai
         FROM gold.indicateurs_socio_eco_iris
         WHERE annee = :annee
-    """)
+    """
+    )
     with engine.connect() as conn:
         return pd.read_sql(query, conn, params={"annee": annee_eff})
 
@@ -83,29 +96,35 @@ def _fetch_environnement(engine):
 
 
 def _fetch_reseau(engine):
-    query = text("""
-        SELECT code_iris, score_final, meilleur_operateur_mobile, meilleur_operateur_fibre
+    query = text(
+        """
+        SELECT code_iris, (score_final / 100) as score_final, meilleur_operateur_mobile, meilleur_operateur_fibre
         FROM gold.score_reseau
-    """)
+    """
+    )
     with engine.connect() as conn:
         df = pd.read_sql(query, conn)
     return df.rename(columns={"score_final": "score_reseau"})
 
 
 def _fetch_mobilite(engine):
-    query = text("""
+    query = text(
+        """
         SELECT code_iris, score_transport_collectif, score_velib, score_mobilite
         FROM gold.indicateurs_mobilite_iris
-    """)
+    """
+    )
     with engine.connect() as conn:
         return pd.read_sql(query, conn)
 
 
 def _fetch_aes(engine):
-    query = text("""
+    query = text(
+        """
         SELECT arrondissement, score_education, score_sante, score_aes
         FROM gold.indicateurs_aes_arrondissement
-    """)
+    """
+    )
     with engine.connect() as conn:
         return pd.read_sql(query, conn)
 
@@ -127,7 +146,9 @@ def _build_iris_dataframe(annee: int) -> pd.DataFrame:
     df = df.merge(reseau, on="code_iris", how="left")
     df = df.merge(mobilite, on="code_iris", how="left")
 
-    df["nb_logements_sociaux_finances"] = df["nb_logements_sociaux_finances"].fillna(0).astype(int)
+    df["nb_logements_sociaux_finances"] = (
+        df["nb_logements_sociaux_finances"].fillna(0).astype(int)
+    )
 
     return df
 
@@ -141,15 +162,27 @@ def get_indicateurs_arrondissement(annee: int = 2025) -> list[dict]:
     df = _build_iris_dataframe(annee)
 
     numeric_cols = [
-        "nb_logements_sociaux_finances", "revenu_median",
-        "prix_m2_median", "iai", "score_environnemental", "score_reseau",
+        "nb_logements_sociaux_finances",
+        "revenu_median",
+        "prix_m2_median",
+        "iai",
+        "score_environnemental",
+        "score_reseau",
     ]
     text_cols = ["meilleur_operateur_mobile", "meilleur_operateur_fibre"]
 
     # agrégation : sum pour logements, mean pour les autres, mode pour les opérateurs
     agg_dict = {"nb_logements_sociaux_finances": "sum"}
-    for col in ["revenu_median", "prix_m2_median", "iai", "score_environnemental", "score_reseau",
-                 "score_transport_collectif", "score_velib", "score_mobilite"]:
+    for col in [
+        "revenu_median",
+        "prix_m2_median",
+        "iai",
+        "score_environnemental",
+        "score_reseau",
+        "score_transport_collectif",
+        "score_velib",
+        "score_mobilite",
+    ]:
         agg_dict[col] = "mean"
 
     grouped = df.groupby("arrondissement")
@@ -157,8 +190,12 @@ def get_indicateurs_arrondissement(annee: int = 2025) -> list[dict]:
 
     # mode pour les opérateurs (le plus fréquent par arrondissement)
     for col in text_cols:
-        modes = grouped[col].agg(lambda x: x.dropna().mode().iloc[0] if not x.dropna().empty else None)
-        result = result.merge(modes.rename(col), on="arrondissement", how="left", suffixes=("_drop", ""))
+        modes = grouped[col].agg(
+            lambda x: x.dropna().mode().iloc[0] if not x.dropna().empty else None
+        )
+        result = result.merge(
+            modes.rename(col), on="arrondissement", how="left", suffixes=("_drop", "")
+        )
         if f"{col}_drop" in result.columns:
             result = result.drop(columns=[f"{col}_drop"])
 

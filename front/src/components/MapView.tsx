@@ -13,42 +13,27 @@ const ZOOM_BASCULE_IRIS = 13;
 
 // limites approximatives de Paris pour empêcher la carte de partir trop loin
 const PARIS_BOUNDS: maplibregl.LngLatBoundsLike = [
-  [2.224, 48.815],
-  [2.470, 48.902],
+  [2.21, 48.80],
+  [2.48, 48.91],
 ];
 
 // style "Plan" : tuiles raster OSM (gratuit, pas de clé API)
-const STYLE_PLAN: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    'osm': {
-      type: 'raster',
-      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-      tileSize: 256,
-      attribution: '© OpenStreetMap',
-    },
-  },
-  layers: [
-    { id: 'osm', type: 'raster', source: 'osm' },
-  ],
-};
+// const STYLE_PLAN: maplibregl.StyleSpecification = {
+//   version: 8,
+//   sources: {
+//     'osm': {
+//       type: 'raster',
+//       tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+//       tileSize: 256,
+//       attribution: '© OpenStreetMap',
+//     },
+//   },
+//   layers: [
+//     { id: 'osm', type: 'raster', source: 'osm' },
+//   ],
+// };
 
-// style "Satellite" : tuiles ESRI World Imagery (libre d'accès, pas de clé)
-const STYLE_SAT: maplibregl.StyleSpecification = {
-  version: 8,
-  sources: {
-    'sat': {
-      type: 'raster',
-      tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-      tileSize: 256,
-      attribution: '© Esri World Imagery',
-    },
-  },
-  layers: [
-    { id: 'sat', type: 'raster', source: 'sat' },
-  ],
-};
-
+const STYLE_PLAN = "https://tiles.openfreemap.org/styles/bright"
 // fonction utilitaire qui colore un FeatureCollection selon un indicateur
 // on injecte une propriété `_color` et `_value` dans chaque feature pour
 // que MapLibre puisse les utiliser dans son expression de fill-color
@@ -115,7 +100,6 @@ export function MapView({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
   const [hover, setHover] = useState<{ x: number; y: number; name: string; value: number | null } | null>(null);
 
   // init de la carte une seule fois
@@ -152,18 +136,16 @@ export function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // change le style de fond (plan/satellite) sans détruire les couches data
-  // on retire les sources data, on charge le nouveau style, puis on les remet
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    map.setStyle(mapMode === 'map' ? STYLE_PLAN : STYLE_SAT);
+    map.setStyle(STYLE_PLAN);
     map.once('styledata', () => {
       // une fois le style chargé on relance l'effet d'ajout des couches data
       // (en changeant `mapMode` on repasse aussi par l'autre useEffect ci-dessous)
       forceLayersUpdate();
     });
-  }, [mapMode]);
+  }, []);
 
   // déclencheur manuel pour rafraîchir les couches data (ajout/maj sources)
   const [layersTick, setLayersTick] = useState(0);
@@ -327,26 +309,9 @@ export function MapView({
     <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: C.mapBg }}>
       <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
 
-      {/* toggle Plan / Satellite */}
-      <div style={{
-        position: 'absolute', top: '12px', left: '12px', zIndex: 10,
-        display: 'flex', background: C.panel, borderRadius: '8px',
-        border: `1px solid ${C.border}`, overflow: 'hidden',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      }}>
-        {([['map', 'Plan'], ['satellite', 'Satellite']] as const).map(([m, l]) => (
-          <button key={m} onClick={() => setMapMode(m)} style={{
-            padding: '6px 13px', fontSize: '12px', fontWeight: mapMode === m ? 600 : 400,
-            background: mapMode === m ? C.accent : 'transparent',
-            color: mapMode === m ? 'white' : C.textMid,
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s',
-          }}>{l}</button>
-        ))}
-      </div>
-
       {/* indication granularité actuelle (arr/iris) */}
       <div style={{
-        position: 'absolute', top: '12px', left: '170px', zIndex: 10,
+        position: 'absolute', top: '12px', left: '12px', zIndex: 10,
         background: C.panel, padding: '6px 11px', borderRadius: '8px',
         border: `1px solid ${C.border}`, fontSize: '11.5px', color: C.textMid,
         boxShadow: '0 2px 8px rgba(0,0,0,0.06)',

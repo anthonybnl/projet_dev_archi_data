@@ -22,13 +22,15 @@ export function fmtVal(v: number | null, id: string): string {
   if (id === 'nb_logements_sociaux_finances') return Math.round(v).toLocaleString('fr-FR') + ' logements';
   if (id === 'revenu_median') return Math.round(v).toLocaleString('fr-FR') + ' €/an';
   if (id === 'iai')    return v.toFixed(1) + ' mois/m²';
+  if (id.startsWith('score_')) return (v * 100).toFixed(1).replace('.', ',') + ' %';
   return String(v);
-}
+}   
 
 // version courte pour la légende (kilo-formatée)
 export function fmtShort(v: number | null, id: string): string {
   if (v === null || v === undefined) return '—';
   if (id === 'iai') return v.toFixed(1);
   if (id === 'nb_logements_sociaux_finances') return v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(Math.round(v));
+  if (id.startsWith('score_')) return (v * 100).toFixed(1).replace('.', ',') + '%';
   return v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(Math.round(v));
 }
