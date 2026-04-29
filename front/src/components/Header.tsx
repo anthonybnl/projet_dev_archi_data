@@ -24,9 +24,9 @@ export function Header({ indicator, year }: { indicator: IndicatorId; year: numb
           <div style={{ fontSize: '13.5px', fontWeight: 700, color: C.text, lineHeight: 1.25 }}>
             Urban Data Explorer
           </div>
-          <div style={{ fontSize: '10px', color: C.textMid, lineHeight: 1.25 }}>
+          {/* <div style={{ fontSize: '10px', color: C.textMid, lineHeight: 1.25 }}>
             Marché du logement · Paris
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -48,7 +48,14 @@ export function Header({ indicator, year }: { indicator: IndicatorId; year: numb
       }}>
         DVF · Filosofi · RPLS
       </div> */}
-      <div><span>Ici on peut mettre du texte custom</span></div>
+
+      <div style={{
+        fontSize: '11px', color: C.text, padding: '4px 10px', 
+      }}>
+        EFREI - M1 Master Data Engineering & IA
+      </div>
+
+      {/* <div><span>Ici on peut mettre du texte custom</span></div> */}
     </header>
   );
 }

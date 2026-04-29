@@ -20,13 +20,6 @@ export function TimelineSection({
             {year}
           </span>
         </div>
-        <input type="range" min={2018} max={2025} value={year}
-          onChange={e => onChange(+e.target.value)}
-          style={{ width: '100%', accentColor: C.accent }} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', marginBottom: '10px' }}>
-          <span style={{ fontSize: '10.5px', color: C.textLight }}>2018</span>
-          <span style={{ fontSize: '10.5px', color: C.textLight }}>2025</span>
-        </div>
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {YEARS.map(y => (
             <button key={y} onClick={() => onChange(y)} style={{

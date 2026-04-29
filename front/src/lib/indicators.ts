@@ -13,7 +13,7 @@ export const INDICATORS: Indicator[] = [
   { id: 'score_reseau',                 label: 'Indice technologique',                        short: 'TEC',         unit: '%',         color: '#74c69d' },
 ];
 
-export const YEARS = [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+export const YEARS = [2020, 2021, 2022, 2023, 2024, 2025];
 
 // formatte une valeur d'indicateur pour l'affichage
 export function fmtVal(v: number | null, id: string): string {
