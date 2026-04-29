@@ -151,6 +151,8 @@ export function MapView({
   const [layersTick, setLayersTick] = useState(0);
   const forceLayersUpdate = () => setLayersTick(t => t + 1);
 
+  const lineWidths = [0.1, 0.2]
+
   // ajoute / met à jour les couches choroplèthe à chaque changement de données
   useEffect(() => {
     const map = mapRef.current;
@@ -167,6 +169,9 @@ export function MapView({
 
       if (map.getSource('arr-src')) {
         (map.getSource('arr-src') as maplibregl.GeoJSONSource).setData(arrFc);
+        map.setPaintProperty('arr-line', 'line-width', [
+          'case', ['==', ['get', '_code'], selectedCode || ''], 2.5, 1,
+        ]);
       } else {
         map.addSource('arr-src', { type: 'geojson', data: arrFc });
         map.addLayer({
@@ -174,24 +179,20 @@ export function MapView({
           maxzoom: ZOOM_BASCULE_IRIS,
           paint: {
             'fill-color': ['get', '_color'],
-            'fill-opacity': [
-              'case',
-              ['==', ['get', '_code'], selectedCode || ''], 0.88,
-              0.72,
-            ],
+            'fill-opacity': 0.7,
           },
         });
         map.addLayer({
           id: 'arr-line', type: 'line', source: 'arr-src',
           maxzoom: ZOOM_BASCULE_IRIS,
           paint: {
-            'line-color': '#ffffff',
+            'line-color': C.accentHover,
             'line-width': [
               'case',
-              ['==', ['get', '_code'], selectedCode || ''], 2.5,
-              1,
+              ['==', ['get', '_code'], selectedCode || ''], lineWidths[1],
+              lineWidths[0],
             ],
-            'line-opacity': 0.85,
+            'line-opacity': 0.7,
           },
         });
         map.addLayer({
@@ -243,6 +244,9 @@ export function MapView({
 
         if (map.getSource('iris-src')) {
           (map.getSource('iris-src') as maplibregl.GeoJSONSource).setData(irisFc);
+          map.setPaintProperty('iris-line', 'line-width', [
+            'case', ['==', ['get', '_code'], selectedCode || ''], 2, 0.6,
+          ]);
         } else {
           map.addSource('iris-src', { type: 'geojson', data: irisFc });
           map.addLayer({
@@ -250,22 +254,18 @@ export function MapView({
             minzoom: ZOOM_BASCULE_IRIS,
             paint: {
               'fill-color': ['get', '_color'],
-              'fill-opacity': [
-                'case',
-                ['==', ['get', '_code'], selectedCode || ''], 0.88,
-                0.7,
-              ],
+              'fill-opacity': 0.7,
             },
           });
           map.addLayer({
             id: 'iris-line', type: 'line', source: 'iris-src',
             minzoom: ZOOM_BASCULE_IRIS,
             paint: {
-              'line-color': '#ffffff',
+              'line-color': C.accentHover,
               'line-width': [
                 'case',
-                ['==', ['get', '_code'], selectedCode || ''], 2,
-                0.6,
+                ['==', ['get', '_code'], selectedCode || ''], lineWidths[1],
+                lineWidths[0],
               ],
               'line-opacity': 0.7,
             },
