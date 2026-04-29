@@ -12,6 +12,7 @@ CREATE TABLE "silver"."espaces_verts" (
     code_postal   INT,
     superficie    DOUBLE PRECISION,
     annee         INT,
+    geo_shape     TEXT,
     code_iris     TEXT,
     PRIMARY KEY (id, code_iris)
 );
