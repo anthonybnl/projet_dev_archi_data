@@ -32,7 +32,7 @@ export function Header({ indicator, year }: { indicator: IndicatorId; year: numb
 
       <div style={{ flex: 1 }} />
 
-      <div style={{
+      {/* <div style={{
         display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px',
         background: C.accentXLight, borderRadius: '6px', border: `1px solid ${C.accentLight}`,
       }}>
@@ -47,7 +47,8 @@ export function Header({ indicator, year }: { indicator: IndicatorId; year: numb
         border: `1px solid ${C.border}`, borderRadius: '6px', background: C.bg,
       }}>
         DVF · Filosofi · RPLS
-      </div>
+      </div> */}
+      <div><span>Ici on peut mettre du texte custom</span></div>
     </header>
   );
 }

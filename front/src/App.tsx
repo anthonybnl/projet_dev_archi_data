@@ -106,20 +106,20 @@ export default function App() {
           display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            <SearchSection
+            {/* <SearchSection
               zones={zonesCourantes}
               onSelect={z => setSelectedCode(z.code)}
-            />
+            /> */}
             <IndicatorsSection
               active={activeInds} onToggle={handleToggle}
               primary={indicator} onPrimary={setIndicator}
             />
             <TimelineSection year={year} onChange={setYear} />
             <DetailsSection zone={selectedZone} onPin={handlePin} pinned={pinned} />
-            <CompareSection pinned={pinned} onUnpin={handleUnpin} />
+            {/* <CompareSection pinned={pinned} onUnpin={handleUnpin} /> */}
           </div>
 
-          <div style={{
+          {/* <div style={{
             borderTop: `1px solid ${C.border}`, padding: '10px 16px',
             display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0,
           }}>
@@ -127,7 +127,7 @@ export default function App() {
             <span style={{ fontSize: '10.5px', color: C.textLight }}>
               Données DVF · Filosofi · RPLS — année {year}
             </span>
-          </div>
+          </div> */}
         </aside>
       </div>
     </div>
