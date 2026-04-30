@@ -47,10 +47,12 @@ export function DetailsSection({
 
   const rowsIndicateursCustom: { label: string; value: string }[] = [
     { label: 'Indice environnemental', value: fmtVal(zone.score_environnemental, 'score_environnemental') },
-    { label: 'Indice de mobilité', value: fmtVal(zone.score_mobilite, 'score_mobilite') },
     { label: 'Indice technologique', value: fmtVal(zone.score_reseau, 'score_reseau') },
     { label: 'Meilleur opérateur mobile', value: zone.meilleur_operateur_mobile || '—' },
     { label: 'Meilleur opérateur fibre', value: zone.meilleur_operateur_fibre || '—' },
+    { label: 'Indice de mobilité', value: fmtVal(zone.score_mobilite, 'score_mobilite') },
+    { label: 'Score de transport collectif', value: fmtVal(zone.score_transport_collectif, 'score_transport_collectif') },
+    { label: 'Score Vélib', value: fmtVal(zone.score_velib, 'score_velib') },
     { label: "Indice d'accessibilité éducation et soin", value: fmtVal(zone.score_aes, 'score_aes') },
     { label: 'Score éducation', value: fmtVal(zone.score_education, 'score_education') },
     { label: 'Score santé', value: fmtVal(zone.score_sante, 'score_sante') },
