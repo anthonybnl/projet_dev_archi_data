@@ -26,13 +26,12 @@ app = FastAPI(
     description="Expose les données gold (DVF, Filosofi, RPLS) au front",
 )
 
-# on autorise le front local (Vite tourne sur :5173 par défaut)
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # endpoints GeoJSON depuis MongoDB

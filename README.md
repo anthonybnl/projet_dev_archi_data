@@ -1,10 +1,69 @@
-# projet_dev_archi_data
+# Urban Data Explorer
 
-Projet Développement Architecture de données.
+Explorer, comprendre et comparer les dynamiques du logement au cœur de Paris.
 
-## Sources de données
+## Démarrage rapide
 
-[sources de données](doc/sources_data.md)
+```bash
+git clone https://github.com/anthonybnl/projet_dev_archi_data.git
+cd projet_dev_archi_data
+docker compose up --build -d
+```
+
+C'est tout. Le pipeline télécharge automatiquement les données, les transforme (Raw → Silver → Gold) et alimente l'API et le frontend.
+
+```
+# Accès après démarrage :
+# Dashboard :    http://localhost
+# API docs :     http://localhost:8000/docs
+# Adminer :      http://localhost:8080  (PostgreSQL)
+# Mongo Express: http://localhost:8081  (MongoDB)
+```
+
+> Le premier démarrage est long (téléchargement des données raw). Les suivants sont instantanés.
+
+Le service `scheduler` re-déclenche l'ingestion tous les dimanches à 3h du matin.
+
+### Lancer le pipeline manuellement (optionnel)
+
+```bash
+# Couches spécifiques uniquement
+docker compose run --rm pipeline python pipeline/run_all.py --layers nosql silver gold
+docker compose run --rm pipeline python pipeline/run_all.py --layers gold
+```
+
+## Pipeline seul (sans Docker)
+
+```bash
+# Activer le venv
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate     # Windows
+
+# Pipeline complet
+python pipeline/run_all.py
+
+# Ou par étape :
+python pipeline/raw/download_all.py
+python pipeline/silver/main_Obligatoire.py
+python pipeline/silver/main_Environnement.py
+python pipeline/silver/main_Mobilite.py
+python pipeline/silver/main_Reseau.py
+python pipeline/silver/main_AES.py
+python pipeline/gold/main_Obligatoire.py
+python pipeline/gold/main_Environnement.py
+python pipeline/gold/main_Mobilite.py
+python pipeline/gold/main_Reseau.py
+python pipeline/gold/main_AES.py
+python no_sql/iris_arr__mongodb.py
+uvicorn api.main:app --reload --port 8000
+```
+
+## Documentation
+
+- [Architecture technique](doc/architecture.md)
+- [Data Catalog](doc/data_catalog.md)
+- [Plan d'implémentation](doc/implementation_plan.md)
+- [Sources de données](doc/sources_data.md)
 
 ## Architecture
 

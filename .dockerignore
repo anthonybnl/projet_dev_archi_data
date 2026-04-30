@@ -1,0 +1,39 @@
+# Données brutes — montées via volume, inutiles dans l'image
+data/
+
+# Fichiers de données volumineux partout dans le projet (filet de sécurité)
+**/*.csv
+**/*.xlsx
+**/*.xls
+**/*.zip
+**/*.txt.zip
+**/*.gpkg
+**/*.geojson
+**/*.parquet
+
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+*.egg-info/
+
+# Node / Frontend (buildé séparément dans front/Dockerfile)
+front/node_modules/
+front/dist/
+
+# Environnement local
+.env
+*.log
+
+# Doc & divers
+doc/
+*.md
+*.drawio
+*.svg

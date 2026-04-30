@@ -98,7 +98,7 @@ def _fetch_environnement(engine):
 def _fetch_reseau(engine):
     query = text(
         """
-        SELECT code_iris, (score_final / 100) as score_final, meilleur_operateur_mobile, meilleur_operateur_fibre
+        SELECT code_iris, score_final, meilleur_operateur_mobile, meilleur_operateur_fibre
         FROM gold.score_reseau
     """
     )
