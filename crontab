@@ -1,0 +1,2 @@
+# Re-ingestion complète chaque dimanche à 03h00
+0 3 * * 0 root cd /app && python pipeline/run_all.py >> /var/log/pipeline.log 2>&1

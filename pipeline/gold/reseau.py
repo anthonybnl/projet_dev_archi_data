@@ -150,10 +150,10 @@ def run(engine):
         result[col] = pd.to_numeric(result[col], errors="coerce").fillna(0)
 
     result["score_final"] = (
-        W_MOBILE * result["score_mobile"]
+        (W_MOBILE * result["score_mobile"]
         + W_QUALITE * result["score_qualite"]
-        + W_FIBRE * result["score_fibre"]
-    ).round(2)
+        + W_FIBRE * result["score_fibre"]) / 100
+    ).round(4)
 
     result["rang_reseau"] = (
         result["score_final"].rank(ascending=False, method="min").astype(int)

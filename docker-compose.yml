@@ -1,4 +1,7 @@
 services:
+
+  #  BASES DE DONNÉES
+
   postgres_urban_data:
     image: postgres:15-alpine
     container_name: postgres_urban_data
@@ -14,7 +17,13 @@ services:
       - postgres_urban_data:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d:ro
     ports:
-      - 5432:5432
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d urban_data"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   mongo:
     image: mongo:8.2.7
@@ -27,9 +36,98 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: postgres
       MONGO_INITDB_DATABASE: urban_data
     ports:
-      - 27017:27017
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  #  PIPELINE (Raw → Silver → Gold + MongoDB)
+
+  pipeline:
+    image: stevenpro9/urban-data-pipeline:latest
+    container_name: pipeline_urban_data
+    networks:
+      - base_de_donnee
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres_urban_data
+      DB_HOST_MONGODB: mongo_db
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./data:/app/data
+      - ./pipeline:/app/pipeline
+    depends_on:
+      postgres_urban_data:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    command: python pipeline/run_all.py --layers raw nosql silver gold
+    restart: "no"
+
+  #  API FASTAPI
+
+  api:
+    image: stevenpro9/urban-data-api:latest
+    container_name: api_urban_data
+    networks:
+      - base_de_donnee
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres_urban_data
+      DB_HOST_MONGODB: mongo_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres_urban_data:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    restart: unless-stopped
+
+  #  FRONTEND REACT (Nginx)
+
+  frontend:
+    image: stevenpro9/urban-data-frontend:latest
+    container_name: frontend_urban_data
+    networks:
+      - base_de_donnee
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  #  SCHEDULER (re-ingestion hebdomadaire via cron)
+
+  scheduler:
+    image: stevenpro9/urban-data-scheduler:latest
+    container_name: scheduler_urban_data
+    networks:
+      - base_de_donnee
+    env_file:
+      - .env
+    environment:
+      DB_HOST: postgres_urban_data
+      DB_HOST_MONGODB: mongo_db
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./data:/app/data
+      - ./crontab:/etc/cron.d/pipeline:ro
+    depends_on:
+      pipeline:
+        condition: service_completed_successfully
+    command: cron -f
+    restart: unless-stopped
+
+  #  OUTILS D'ADMINISTRATION
 
   mongo-express:
     image: mongo-express:1.0.2
@@ -38,12 +136,15 @@ services:
     networks:
       - base_de_donnee
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://root:postgres@mongo:27017/
       ME_CONFIG_BASICAUTH_ENABLED: true
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: postgres
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   adminer:
     image: adminer:5.4.2-standalone
@@ -52,16 +153,11 @@ services:
     networks:
       - base_de_donnee
     ports:
-      - 8080:8080
+      - "8080:8080"
+    depends_on:
+      postgres_urban_data:
+        condition: service_healthy
 
-  dbgate:
-    image: dbgate/dbgate:7.1.9
-    container_name: dbgate_universal
-    restart: unless-stopped
-    ports:
-      - 3000:3000 # Accès via http://localhost:3000
-    networks:
-      - base_de_donnee
 
 networks:
   base_de_donnee:

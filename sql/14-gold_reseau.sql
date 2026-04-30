@@ -1,4 +1,4 @@
--- Une ligne par code_iris — table de sortie finale du pipeline réseau.
+-- Une ligne par code_iris - table de sortie finale du pipeline réseau.
 -- Agrège les trois sous-scores silver en un score réseau unique exposé au front.
 
 CREATE TABLE gold.score_reseau (
