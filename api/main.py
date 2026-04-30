@@ -12,13 +12,14 @@ if not str(ROOT) in sys.path:
     sys.path.insert(0, str(ROOT))
 
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from sqlalchemy import text
 from pipeline.db import get_engine
 from api.geo import get_arrondissements_geojson, get_iris_geojson
 from api.indicateurs import get_indicateurs_iris, get_indicateurs_arrondissement
+from api.couches import get_couche, COUCHES_DISPO
 
 app = FastAPI(
     title="Urban Data Explorer — API indicateurs",
@@ -58,3 +59,12 @@ def indicateurs_iris(annee: int = Query(2025)):
 @app.get("/api/indicateurs/arrondissement")
 def indicateurs_arrondissement(annee: int = Query(2025)):
     return get_indicateurs_arrondissement(annee)
+
+
+# endpoint couches géographiques
+
+@app.get("/api/couches/{nom}")
+def couche(nom: str):
+    if nom not in COUCHES_DISPO:
+        raise HTTPException(404, f"Couche '{nom}' inconnue. Disponibles : {', '.join(COUCHES_DISPO)}")
+    return get_couche(get_engine(), nom)

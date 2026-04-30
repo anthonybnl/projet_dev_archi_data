@@ -101,9 +101,7 @@ def main():
 
     # Conversion de la colonne geo_shape (GeoJSON string) en geometry shapely
     df["geometry"] = df["geo_shape"].apply(lambda s: shape(json.loads(s)))
-    gdf_ev = gpd.GeoDataFrame(
-        df.drop(columns=["geo_shape"]), geometry="geometry", crs="EPSG:4326"
-    )
+    gdf_ev = gpd.GeoDataFrame(df, geometry="geometry", crs="EPSG:4326")
 
     # Jointure spatiale
     gdf_joined = gpd.sjoin(gdf_ev, gdf_iris, how="left", predicate="intersects")

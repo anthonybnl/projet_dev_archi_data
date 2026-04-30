@@ -131,7 +131,8 @@ def calculer_indicateurs(df_iris, arrets, gares, velib):
     df["score_mobilite_raw"] = (
         W_TRANSPORT * df["score_transport_collectif"] + W_VELIB * df["score_velib"]
     )
-    df["score_mobilite"] = _normalize(df["score_mobilite_raw"])
+    # df["score_mobilite"] = _normalize(df["score_mobilite_raw"])
+    df["score_mobilite"] = df["score_mobilite_raw"].copy()
 
     score_cols = [
         "score_transport_collectif",
